@@ -22,6 +22,12 @@ CREATE TABLE accounts(
     FOREIGN KEY (user_id) REFERENCES users(id_user) ON DELETE CASCADE
     );
 
+CREATE TABLE tokens(
+    account_id SERIAL PRIMARY KEY,
+    FOREIGN KEY (account_id) REFERENCES accounts(id_account) ON DELETE CASCADE,
+    refresh_token TEXT NOT NULL
+);
+
 CREATE TABLE stats(
     id_stat SERIAL PRIMARY KEY,
     kick_accyr REAL,

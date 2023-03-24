@@ -1,5 +1,6 @@
 const db = require('../db');
 const bcrypt = require('bcrypt');
+const tokenService = require('../service/token-service');
 
 class UserService {
   async createUser({ name, surname, patronimyc, phone, email, login, password }) {
@@ -24,7 +25,9 @@ class UserService {
       `INSERT INTO accounts(login, password, user_id) VALUES ($1, $2, $3) RETURNING *`,
       [login, hashPassword, newUser.rows[0].id_user],
     );
-    return [newUser.rows, newAccount.rows];
+    const tokens = tokenService.generateTokens({ newUser });
+    await tokenService.saveToken(newUser.id, tokens.refreshToken);
+    return { ...newUser.rows[0], ...newAccount.rows[0], ...tokens };
   }
 
   async getOneUser(id) {

@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+require('dotenv').config();
+
 const userRouter = require('./routes/user.routes');
 const authRouter = require('./routes/auth.routes');
 
