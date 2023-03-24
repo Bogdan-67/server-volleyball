@@ -4,6 +4,7 @@ const authController = require('../controller/auth.controller.js');
 
 router.post('/login', authController.loginUser);
 router.post('/logout', authController.logoutUser);
+router.get('/activate/:Link');
 router.get('/refresh', authController.refreshToken);
 
 module.exports = router;

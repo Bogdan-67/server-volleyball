@@ -1,4 +1,5 @@
 const db = require('../db');
+const bcrypt = require('bcrypt');
 
 class UserService {
   async createUser({ name, surname, patronimyc, phone, email, login, password }) {
@@ -18,9 +19,10 @@ class UserService {
       `INSERT INTO users(name, surname, patronimyc, phone, email) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [name, surname, patronimyc, phone, email],
     );
+    const hashPassword = await bcrypt.hash(password, 3);
     const newAccount = await db.query(
       `INSERT INTO accounts(login, password, user_id) VALUES ($1, $2, $3) RETURNING *`,
-      [login, password, newUser.rows[0].id_user],
+      [login, hashPassword, newUser.rows[0].id_user],
     );
     return [newUser.rows, newAccount.rows];
   }
