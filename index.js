@@ -1,15 +1,19 @@
 const express = require('express');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const userRouter = require('./routes/user.routes');
-const accountRouter = require('./routes/account.routes');
+const authRouter = require('./routes/auth.routes');
 
 const PORT = process.env.PORT || 8000;
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors());
 
 app.use('/api', userRouter);
-app.use('/api', accountRouter);
+app.use('/api', authRouter);
 
 const start = async () => {
   try {
