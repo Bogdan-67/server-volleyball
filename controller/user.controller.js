@@ -4,26 +4,23 @@ class UserController {
   async createUser(req, res) {
     try {
       const { name, surname, patronimyc, phone, email, login, password } = req.body;
-      const users = await db.query('SELECT phone, email FROM users');
-      for (let i = 0; i < users.rows.length; i++) {
-        if (phone === users.rows[i].phone) {
-          return res
-            .status(400)
-            .json({ message: 'Пользователь с таким номером телефона уже зарегистрирован!' });
-        }
-        if (email === users.rows[i].email) {
-          return res
-            .status(400)
-            .json({ message: 'Пользователь с такой почтой уже зарегистрирован!' });
-        }
+      const checkPhone = await db.query(`SELECT * FROM users WHERE phone = $1`, [phone]);
+      if (checkPhone.rows[0]) {
+        return res
+          .status(400)
+          .json({ message: 'Пользователь с таким номером телефона уже зарегистрирован!' });
       }
-      const logins = await db.query('SELECT login FROM accounts');
-      for (let i = 0; i < logins.rows.length; i++) {
-        if (login === logins.rows[i].phone) {
-          return res
-            .status(400)
-            .json({ message: 'Пользователь с таким логином уже зарегистрирован!' });
-        }
+      const checkEmail = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+      if (checkEmail.rows[0]) {
+        return res
+          .status(400)
+          .json({ message: 'Пользователь с такой почтой уже зарегистрирован!' });
+      }
+      const checkLogin = await db.query(`SELECT * FROM accounts WHERE login = $1`, [login]);
+      if (checkLogin.rows[0]) {
+        return res
+          .status(400)
+          .json({ message: 'Пользователь с таким логином уже зарегистрирован!' });
       }
       const newUser = await db.query(
         `INSERT INTO users(name, surname, patronimyc, phone, email) VALUES ($1, $2, $3, $4, $5) RETURNING *`,

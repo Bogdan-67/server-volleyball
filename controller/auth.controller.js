@@ -1,6 +1,6 @@
 const db = require('../db');
 
-class authController {
+class AuthController {
   async loginUser(req, res, next) {
     try {
     } catch (e) {}
@@ -17,4 +17,4 @@ class authController {
   }
 }
 
-module.exports = new authController();
+module.exports = new AuthController();
