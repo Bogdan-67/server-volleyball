@@ -1,7 +1,7 @@
 const db = require('../db');
 
 class UserService {
-  async createUser(name, surname, patronimyc, phone, email, login, password) {
+  async createUser({ name, surname, patronimyc, phone, email, login, password }) {
     const checkPhone = await db.query(`SELECT * FROM users WHERE phone = $1`, [phone]);
     if (checkPhone.rows[0]) {
       throw new Error({ message: 'Пользователь с таким номером телефона уже зарегистрирован!' });
@@ -25,14 +25,9 @@ class UserService {
     return [newUser.rows, newAccount.rows];
   }
 
-  async getOneUser(req, res) {
-    try {
-      const id = req.params.id;
-      const user = await db.query(`SELECT * FROM users WHERE id_user = $1`, [id]);
-      res.status(200).json(user.rows[0]);
-    } catch (e) {
-      res.status(500).json(e);
-    }
+  async getOneUser(id) {
+    const user = await db.query(`SELECT * FROM users WHERE id_user = $1`, [id]);
+    return user;
   }
 
   async getUsers(req, res) {
