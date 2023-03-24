@@ -22,8 +22,8 @@ class UserController {
 
   async getUsers(req, res) {
     try {
-      const users = await db.query('SELECT * FROM users');
-      res.status(200).json(users.rows);
+      const getUsers = await UserService.getUsers();
+      res.status(200).json(getUsers.rows);
     } catch (e) {
       res.status(500).json(e);
     }
