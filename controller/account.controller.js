@@ -1,9 +1,5 @@
 class AccountController {
-  async createAccount(req, res) {
-    const { login, password } = req.body;
-    console.log(login, password);
-    res.json('account ok');
-  }
+  async createAccount(req, res) {}
   async getOneAccount(req, res) {}
 }
 
