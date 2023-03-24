@@ -31,13 +31,8 @@ class UserController {
 
   async updateUser(req, res) {
     try {
-      const { name, surname, patronimyc, phone, email } = req.body;
-      const id = req.params.id;
-      const user = await db.query(
-        'UPDATE users SET name = $1, surname = $2, patronimyc = $3, phone = $4, email = $5 WHERE id_user = $6 RETURNING *',
-        [name, surname, patronimyc, phone, email, id],
-      );
-      res.status(200).json(user.rows[0]);
+      const updatedUser = await UserService.updateUser(req.body, req.params.id);
+      res.status(200).json(updatedUser.rows[0]);
     } catch (e) {
       res.status(500).json(e);
     }

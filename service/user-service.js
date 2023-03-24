@@ -35,18 +35,12 @@ class UserService {
     return users;
   }
 
-  async updateUser(req, res) {
-    try {
-      const { name, surname, patronimyc, phone, email } = req.body;
-      const id = req.params.id;
-      const user = await db.query(
-        'UPDATE users SET name = $1, surname = $2, patronimyc = $3, phone = $4, email = $5 WHERE id_user = $6 RETURNING *',
-        [name, surname, patronimyc, phone, email, id],
-      );
-      res.status(200).json(user.rows[0]);
-    } catch (e) {
-      res.status(500).json(e);
-    }
+  async updateUser({ name, surname, patronimyc, phone, email }, id) {
+    const user = await db.query(
+      'UPDATE users SET name = $1, surname = $2, patronimyc = $3, phone = $4, email = $5 WHERE id_user = $6 RETURNING *',
+      [name, surname, patronimyc, phone, email, id],
+    );
+    return user;
   }
 
   async deleteUser(req, res) {
