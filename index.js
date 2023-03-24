@@ -11,4 +11,12 @@ app.use(express.json());
 app.use('/api', userRouter);
 app.use('/api', accountRouter);
 
-app.listen(PORT, () => console.log(`server started on port ${PORT}`));
+const start = async () => {
+  try {
+    app.listen(PORT, () => console.log(`server started on port ${PORT}`));
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+start();
