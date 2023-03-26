@@ -1,6 +1,7 @@
 const db = require('../db');
 const bcrypt = require('bcrypt');
 const tokenService = require('../service/token-service');
+const UserDTO = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
 
 class UserService {
@@ -26,7 +27,8 @@ class UserService {
       `INSERT INTO accounts(login, password, user_id) VALUES ($1, $2, $3) RETURNING *`,
       [login, hashPassword, newUser.rows[0].id_user],
     );
-    const tokens = tokenService.generateTokens({ newUser });
+    const userDto = new UserDTO(newAccount);
+    const tokens = tokenService.generateTokens({ userDto });
     await tokenService.saveToken(newAccount.rows[0].id_account, tokens.refreshToken);
     return { ...newUser.rows[0], ...newAccount.rows[0], ...tokens };
   }

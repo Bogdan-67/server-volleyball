@@ -13,13 +13,12 @@ class TokenService {
 
   async saveToken(accountId, refreshToken) {
     const tokenData = await db.query(`SELECT * FROM tokens WHERE account_id = $1`, [accountId]);
-    console.log('tokenData:', tokenData);
     if (tokenData.rows[0]) {
-      tokenData = await db.query(
+      const newToken = await db.query(
         `UPDATE tokens SET refresh_token = $1 WHERE account_id = $2 RETURNING *`,
         [refreshToken, accountId],
       );
-      return tokenData;
+      return newToken;
     }
     const token = await db.query(
       `INSERT INTO tokens(account_id, refresh_token) VALUES ($1, $2) RETURNING *`,
