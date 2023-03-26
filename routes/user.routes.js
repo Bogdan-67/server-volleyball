@@ -1,8 +1,14 @@
 const Router = require('express');
 const router = new Router();
 const userController = require('../controller/user.controller');
+const { body } = require('express-validator');
 
-router.post('/registration', userController.createUser);
+router.post(
+  '/registration',
+  body('email').isEmail(),
+  body('password').isLength({ min: 4, max: 32 }),
+  userController.createUser,
+);
 router.get('/user', userController.getUsers);
 router.get('/user/:id', userController.getOneUser);
 router.put('/user/:id', userController.updateUser);
