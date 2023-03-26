@@ -1,20 +1,21 @@
 const db = require('../db');
 const bcrypt = require('bcrypt');
 const tokenService = require('../service/token-service');
+const ApiError = require('../exceptions/api-error');
 
 class UserService {
   async createUser({ name, surname, patronimyc, phone, email, login, password }) {
     const checkPhone = await db.query(`SELECT * FROM users WHERE phone = $1`, [phone]);
     if (checkPhone.rows[0]) {
-      throw new Error({ message: 'Пользователь с таким номером телефона уже зарегистрирован!' });
+      throw ApiError.BadRequest('Пользователь с таким номером телефона уже зарегистрирован!');
     }
     const checkEmail = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
     if (checkEmail.rows[0]) {
-      throw new Error({ message: 'Пользователь с такой почтой уже зарегистрирован!' });
+      throw ApiError.BadRequest('Пользователь с такой почтой уже зарегистрирован!');
     }
     const checkLogin = await db.query(`SELECT * FROM accounts WHERE login = $1`, [login]);
     if (checkLogin.rows[0]) {
-      throw new Error({ message: 'Пользователь с таким логином уже зарегистрирован!' });
+      throw ApiError.BadRequest('Пользователь с таким логином уже зарегистрирован!');
     }
     const newUser = await db.query(
       `INSERT INTO users(name, surname, patronimyc, phone, email) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
