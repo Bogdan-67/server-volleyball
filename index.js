@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const userRouter = require('./routes/user.routes');
 const authRouter = require('./routes/auth.routes');
+const errorMiddleware = require('./middlewares/error-middleware');
 
 const PORT = process.env.PORT || 8000;
 
@@ -16,6 +17,7 @@ app.use(cors());
 
 app.use('/api', userRouter);
 app.use('/api', authRouter);
+app.use(errorMiddleware);
 
 const start = async () => {
   try {

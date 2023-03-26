@@ -26,7 +26,7 @@ class UserService {
       [login, hashPassword, newUser.rows[0].id_user],
     );
     const tokens = tokenService.generateTokens({ newUser });
-    await tokenService.saveToken(newUser.id, tokens.refreshToken);
+    await tokenService.saveToken(newAccount.rows[0].id_account, tokens.refreshToken);
     return { ...newUser.rows[0], ...newAccount.rows[0], ...tokens };
   }
 
