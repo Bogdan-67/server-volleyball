@@ -11,6 +11,24 @@ class TokenService {
     };
   }
 
+  validateAccessToken(token) {
+    try {
+      const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      return userData;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  validateRefreshToken(token) {
+    try {
+      const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      return userData;
+    } catch (e) {
+      return null;
+    }
+  }
+
   async saveToken(accountId, refreshToken) {
     const tokenData = await db.query(`SELECT * FROM tokens WHERE account_id = $1`, [accountId]);
     if (tokenData.rows[0]) {
@@ -25,6 +43,18 @@ class TokenService {
       [accountId, refreshToken],
     );
     return token;
+  }
+
+  async removeToken(refreshToken) {
+    const tokenData = await db.query(`DELETE FROM tokens WHERE refresh_token = $1`, [refreshToken]);
+    return tokenData;
+  }
+
+  async findToken(refreshToken) {
+    const tokenData = await db.query(`SELECT * FROM tokens WHERE refresh_token = $1`, [
+      refreshToken,
+    ]);
+    return tokenData;
   }
 }
 

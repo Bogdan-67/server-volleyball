@@ -18,12 +18,26 @@ class AuthController {
 
   async logoutUser(req, res, next) {
     try {
-    } catch (e) {}
+      const { refreshToken } = req.cookies;
+      const token = authService.logout(refreshToken);
+      res.clearCookie('refreshToken');
+      res.json(token);
+    } catch (e) {
+      next(e);
+    }
   }
 
   async refreshToken(req, res, next) {
     try {
-    } catch (e) {}
+      const { refreshToken } = req.cookies;
+      const userData = await authService.refresh(refreshToken);
+      res.cookie('refreshToken', userData.refreshToken, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
+    } catch (e) {
+      next(e);
+    }
   }
 }
 

@@ -19,6 +19,29 @@ class AuthService {
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
     return { ...tokens, ...userDto };
   }
+
+  async logout(refreshToken) {
+    const token = await tokenService.removeToken(refreshToken);
+    return token;
+  }
+
+  async refresh(refreshToken) {
+    if (!refreshToken) {
+      throw ApiError.UnauthorisedError();
+    }
+    const userData = tokenService.validateRefreshToken(refreshToken);
+    const tokenFromDb = await tokenService.findToken(refreshToken);
+    if (!userData || !tokenFromDb) {
+      throw ApiError.UnauthorisedError();
+    }
+    const user = await db.query(`SELECT * FROM accounts WHERE id_account = $1`, [
+      userData.id_account,
+    ]);
+    const userDto = new UserDTO(user.rows[0]);
+    const tokens = tokenService.generateTokens({ ...userDto });
+    await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
+    return { ...tokens, ...userDto };
+  }
 }
 
 module.exports = new AuthService();
