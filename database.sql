@@ -32,24 +32,24 @@ CREATE TABLE stats(
     id_stat SERIAL PRIMARY KEY,
     inninig_accyr REAL,
     stat_block REAL,
-    user_id INTEGER,
-    FOREIGN KEY (user_id) REFERENCES users(id_user) ON DELETE CASCADE
+    account_id INTEGER,
+    FOREIGN KEY (account_id) REFERENCES accounts(id_account) ON DELETE CASCADE
     );
 
 CREATE TABLE trainings(
     id_train SERIAL PRIMARY KEY,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
-    inning_accyr_train REAL,
-    stat_block_train REAL,
-    sum_scores_train REAL,
-    inning_sum INTEGER,
-    blocks_sum INTEGER,
-    attacks_sum INTEGER,
-    catch_sum INTEGER,
-    defence_sum INTEGER,
-    support_sum INTEGER,
-    user_id INTEGER,
-    FOREIGN KEY (user_id) REFERENCES users(id_user) ON DELETE CASCADE
+    inning_accyr_train REAL  DEFAULT 0,
+    stat_block_train REAL  DEFAULT 0,
+    sum_scores_train REAL DEFAULT 0,
+    inning_sum INTEGER DEFAULT 0,
+    blocks_sum INTEGER DEFAULT 0,
+    attacks_sum INTEGER DEFAULT 0,
+    catch_sum INTEGER DEFAULT 0,
+    defence_sum INTEGER DEFAULT 0,
+    support_sum INTEGER DEFAULT 0,
+    account_id INTEGER,
+    FOREIGN KEY (account_id) REFERENCES accounts(id_account) ON DELETE CASCADE
     );
 
 CREATE TABLE action_types(

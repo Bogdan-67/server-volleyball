@@ -1,4 +1,3 @@
-const db = require('../db');
 const UserService = require('../service/user-service.js');
 const { validationResult } = require('express-validator');
 const ApiError = require('../exceptions/api-error');
@@ -11,7 +10,6 @@ class UserController {
         return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
       }
       const createdUser = await UserService.createUser(req.body);
-      console.log('createdUser:', createdUser);
       res.cookie('refreshToken', createdUser.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,

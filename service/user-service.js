@@ -27,7 +27,10 @@ class UserService {
       `INSERT INTO accounts(login, password, user_id) VALUES ($1, $2, $3) RETURNING *`,
       [login, hashPassword, newUser.rows[0].id_user],
     );
-    const userDto = new UserDTO(newAccount);
+    const role = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [
+      newAccount.rows[0].role_id,
+    ]);
+    const userDto = new UserDTO({ ...newAccount.rows[0], ...role.rows[0] });
     const tokens = tokenService.generateTokens({ userDto });
     await tokenService.saveToken(newAccount.rows[0].id_account, tokens.refreshToken);
     return { ...newUser.rows[0], ...newAccount.rows[0], ...tokens };
