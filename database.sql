@@ -30,23 +30,29 @@ CREATE TABLE tokens(
 
 CREATE TABLE stats(
     id_stat SERIAL PRIMARY KEY,
-    kick_accyr REAL,
+    inninig_accyr REAL,
     stat_block REAL,
     user_id INTEGER,
-    FOREIGN KEY user_id REFERENCES users(id_user) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id_user) ON DELETE CASCADE
     );
 
 CREATE TABLE trainings(
     id_train SERIAL PRIMARY KEY,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
-    kick_accyr_train REAL,
+    inning_accyr_train REAL,
     stat_block_train REAL,
-    sum_scores_train INTEGER,
+    sum_scores_train REAL,
+    inning_sum INTEGER,
+    blocks_sum INTEGER,
+    attacks_sum INTEGER,
+    catch_sum INTEGER,
+    defence_sum INTEGER,
+    support_sum INTEGER,
     user_id INTEGER,
-    FOREIGN KEY user_id REFERENCES users(id_user)
+    FOREIGN KEY (user_id) REFERENCES users(id_user) ON DELETE CASCADE
     );
 
-CREATE TABLE actions_types(
+CREATE TABLE action_types(
     id_action_type SERIAL PRIMARY KEY,
     name_type VARCHAR(255) NOT NULL,
     act_or_form VARCHAR(255) NOT NULL,
@@ -61,7 +67,9 @@ CREATE TABLE actions(
     time TIME NOT NULL DEFAULT current_time,
     condition VARCHAR(255) NOT NULL,
     result VARCHAR(255) NOT NULL,
-    score INTEGER NOT NULL,
+    score REAL NOT NULL,
     train_id INTEGER,
-    FOREIGN KEY train_id REFERENCES trainings(id_train)
+    FOREIGN KEY (train_id) REFERENCES trainings(id_train) ON DELETE CASCADE,
+    action_type_id INTEGER,
+    FOREIGN KEY (action_type_id) REFERENCES action_types(id_action_type) ON DELETE CASCADE
     );

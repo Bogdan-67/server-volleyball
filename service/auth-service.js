@@ -14,7 +14,8 @@ class AuthService {
     if (!isPassEquals) {
       throw ApiError.BadRequest('Неверный пароль!');
     }
-    const userDto = new UserDTO(user.rows[0]);
+    const role = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [user.rows[0].role_id]);
+    const userDto = new UserDTO({ ...user.rows[0], ...role.rows[0] });
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
     return { ...tokens, ...userDto };
