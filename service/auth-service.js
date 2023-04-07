@@ -18,7 +18,7 @@ class AuthService {
     const userDto = new UserDTO({ ...user.rows[0], ...role.rows[0] });
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
-    return { ...tokens, ...userDto };
+    return { ...tokens, user: { ...userDto } };
   }
 
   async logout(refreshToken) {

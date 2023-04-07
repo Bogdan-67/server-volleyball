@@ -4,7 +4,8 @@ CREATE TABLE users(
     surname VARCHAR(255) NOT NULL,
     patronimyc VARCHAR(255),
     phone VARCHAR(20),
-    email VARCHAR(100)
+    email VARCHAR(100),
+    group VARCHAR(100)
 );
 
 CREATE TABLE roles(
