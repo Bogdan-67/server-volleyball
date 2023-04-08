@@ -39,9 +39,10 @@ class AuthService {
       userData.id_account,
     ]);
     const userDto = new UserDTO(user.rows[0]);
+    userDto.role = userData.role;
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
-    return { ...tokens, ...userDto };
+    return { ...tokens, user: { ...userDto } };
   }
 }
 

@@ -1,7 +1,9 @@
 module.exports = class UserDTO {
   id_account;
   id_user;
-  fio;
+  name;
+  surname;
+  patronimyc;
   email;
   phone;
   group;
@@ -11,7 +13,9 @@ module.exports = class UserDTO {
   constructor(model) {
     this.id_account = model.id_account;
     this.id_user = model.id_user;
-    this.fio = model.fio;
+    this.name = model.name;
+    this.surname = model.surname;
+    this.patronimyc = model.patronimyc;
     this.email = model.email;
     this.phone = model.phone;
     this.group = model.group;
