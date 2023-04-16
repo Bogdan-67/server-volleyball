@@ -35,10 +35,11 @@ class AuthService {
     if (!userData || !tokenFromDb) {
       throw ApiError.UnauthorisedError();
     }
-    const user = await db.query(`SELECT * FROM accounts WHERE id_account = $1`, [
+    const account = await db.query(`SELECT * FROM accounts WHERE id_account = $1`, [
       userData.id_account,
     ]);
-    const userDto = new UserDTO(user.rows[0]);
+    const user = await db.query('SELECT * FROM users WHERE id_user = $1', [userData.id_account]);
+    const userDto = new UserDTO({ ...account.rows[0], ...user.rows[0] });
     userDto.role = userData.role;
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);

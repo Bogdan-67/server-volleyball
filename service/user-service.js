@@ -30,7 +30,7 @@ class UserService {
     const role = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [
       newAccount.rows[0].role_id,
     ]);
-    const userDto = new UserDTO({ ...newAccount.rows[0], ...role.rows[0] });
+    const userDto = new UserDTO({ ...newAccount.rows[0], ...role.rows[0], ...newUser.rows[0] });
     const tokens = tokenService.generateTokens({ userDto });
     await tokenService.saveToken(newAccount.rows[0].id_account, tokens.refreshToken);
     return { user: { ...newUser.rows[0], ...newAccount.rows[0] }, ...tokens };
