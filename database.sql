@@ -5,12 +5,12 @@ CREATE TABLE users(
     patronimyc VARCHAR(255),
     phone VARCHAR(20),
     email VARCHAR(100),
-    group VARCHAR(100)
+    team VARCHAR(100)
 );
 
 CREATE TABLE roles(
     id_role SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    role_name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE accounts(
@@ -19,8 +19,8 @@ CREATE TABLE accounts(
     password VARCHAR(255) NOT NULL,
     role_id INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY (role_id) REFERENCES roles(id_role) ON DELETE CASCADE,
-    user_id INTEGER NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id_user) ON DELETE CASCADE
+    id_user INTEGER NOT NULL,
+    FOREIGN KEY (id_user) REFERENCES users(id_user) ON DELETE CASCADE
     );
 
 CREATE TABLE tokens(

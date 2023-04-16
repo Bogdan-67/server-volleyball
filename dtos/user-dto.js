@@ -6,7 +6,7 @@ module.exports = class UserDTO {
   patronimyc;
   email;
   phone;
-  group;
+  team;
   login;
   role;
 
@@ -18,8 +18,8 @@ module.exports = class UserDTO {
     this.patronimyc = model.patronimyc;
     this.email = model.email;
     this.phone = model.phone;
-    this.group = model.group;
+    this.team = model.team;
     this.login = model.login;
-    this.role = model.name;
+    this.role = model.role_name;
   }
 };

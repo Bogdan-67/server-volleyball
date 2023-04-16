@@ -9,7 +9,7 @@ router.post(
   body('password').isLength({ min: 4, max: 32 }),
   userController.createUser,
 );
-router.get('/user', userController.getUsers);
+router.get('/users', userController.getUsers);
 router.get('/user/:id', userController.getOneUser);
 router.put('/user/:id', userController.updateUser);
 router.delete('/user/:id', userController.deleteUser);
