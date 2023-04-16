@@ -35,7 +35,7 @@ class AuthService {
     if (!userData || !tokenFromDb) {
       throw ApiError.UnauthorisedError();
     }
-    const account = await db.query(`SELECT * FROM accounts WHERE id_account = $1 `, [
+    const account = await db.query(`SELECT * FROM accounts WHERE id_account = $1`, [
       userData.id_account,
     ]);
     const user = await db.query('SELECT * FROM users WHERE id_user = $1', [userData.id_account]);

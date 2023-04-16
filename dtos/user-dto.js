@@ -13,6 +13,7 @@ module.exports = class UserDTO {
   constructor(model) {
     this.id_account = model.id_account;
     this.id_user = model.id_user;
+    this.user_id = model.user_id;
     this.name = model.name;
     this.surname = model.surname;
     this.patronimyc = model.patronimyc;

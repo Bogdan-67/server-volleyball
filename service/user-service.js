@@ -5,7 +5,7 @@ const UserDTO = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
 
 class UserService {
-  async createUser({ name, surname, patronimyc, phone, email, login, password }) {
+  async createUser({ name, surname, patronimyc, phone, email, login, password, team }) {
     const checkPhone = await db.query(`SELECT * FROM users WHERE phone = $1`, [phone]);
     if (checkPhone.rows[0]) {
       throw ApiError.BadRequest('Пользователь с таким номером телефона уже зарегистрирован!');
@@ -19,8 +19,8 @@ class UserService {
       throw ApiError.BadRequest('Пользователь с таким логином уже зарегистрирован!');
     }
     const newUser = await db.query(
-      `INSERT INTO users(name, surname, patronimyc, phone, email) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [name, surname, patronimyc, phone, email],
+      `INSERT INTO users(name, surname, patronimyc, phone, email, team) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [name, surname, patronimyc, phone, email, team],
     );
     const hashPassword = await bcrypt.hash(password, 3);
     const newAccount = await db.query(
@@ -33,7 +33,7 @@ class UserService {
     const userDto = new UserDTO({ ...newAccount.rows[0], ...role.rows[0], ...newUser.rows[0] });
     const tokens = tokenService.generateTokens({ userDto });
     await tokenService.saveToken(newAccount.rows[0].id_account, tokens.refreshToken);
-    return { ...newUser.rows[0], ...newAccount.rows[0], ...tokens };
+    return { user: { ...newUser.rows[0], ...newAccount.rows[0] }, ...tokens };
   }
 
   async getOneUser(id) {
