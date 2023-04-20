@@ -27,17 +27,22 @@ class AuthService {
   }
 
   async refresh(refreshToken) {
+    console.log('refresh token', refreshToken);
     if (!refreshToken) {
       throw ApiError.UnauthorisedError();
     }
     const userData = tokenService.validateRefreshToken(refreshToken);
     const tokenFromDb = await tokenService.findToken(refreshToken);
-    if (!userData || !tokenFromDb) {
+    if (!userData || !tokenFromDb || !userData.id_account) {
       throw ApiError.UnauthorisedError();
     }
     const user = await db.query(`SELECT * FROM accounts WHERE id_account = $1`, [
       userData.id_account,
     ]);
+    if (!user.rows[0]) {
+      throw ApiError.BadRequest('Пользователь не найден!');
+    }
+    console.log(user.rows[0]);
     const userDto = new UserDTO(user.rows[0]);
     userDto.role = userData.role;
     const tokens = tokenService.generateTokens({ ...userDto });

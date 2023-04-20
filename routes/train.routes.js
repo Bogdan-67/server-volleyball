@@ -4,8 +4,8 @@ const trainController = require('../controller/train.controller');
 const authMiddleware = require('../middlewares/auth-middleware');
 
 router.post('/train', authMiddleware, trainController.addTrain);
-router.get('/train', authMiddleware, trainController.getTrains);
-router.get('/train/:date', authMiddleware, trainController.getOneTrain);
+router.get('/trains/:account_id', authMiddleware, trainController.getTrains);
+router.get('/train/:account_id', authMiddleware, trainController.getOneTrain);
 router.put('/train', authMiddleware, trainController.editTrain);
 router.delete('/train', authMiddleware, trainController.deleteTrain);
 
