@@ -4,8 +4,8 @@ const ApiError = require('../exceptions/api-error');
 class TrainController {
   async addTrain(req, res, next) {
     try {
-      const { account_id } = req.body;
-      const newTrain = await trainService.addTrain(account_id);
+      const { account_id, day_team } = req.body;
+      const newTrain = await trainService.addTrain(account_id, day_team);
       res.status(200).json(newTrain.rows[0]);
     } catch (e) {
       next(e);
@@ -14,9 +14,9 @@ class TrainController {
   async getOneTrain(req, res, next) {
     try {
       const account_id = req.params.account_id;
-      const { date } = req.query;
+      const { date, day_team } = req.query;
       console.log(date);
-      const train = await trainService.getOneTrain(account_id, date);
+      const train = await trainService.getOneTrain(account_id, date, day_team);
       console.log(train);
       res.status(200).json(train.rows[0]);
     } catch (e) {
@@ -27,7 +27,7 @@ class TrainController {
     try {
       const account_id = req.params.account_id;
       const { date_start, date_end } = req.query;
-      console.log('date_start:', date_start, 'date_end', date_end);
+      console.log('date_start:', date_start, 'date_end:', date_end);
       const trains = await trainService.getTrains(account_id, date_start, date_end);
       res.status(200).json(trains.rows);
     } catch (e) {

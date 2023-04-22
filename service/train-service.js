@@ -2,27 +2,31 @@ const db = require('../db');
 const ApiError = require('../exceptions/api-error');
 
 class TrainService {
-  async addTrain(account_id) {
+  async addTrain(account_id, day_team) {
     if (!account_id) {
       throw ApiError.UnauthorisedError();
     }
+    if (!day_team) {
+      throw ApiError.BadRequest('Не введено название команды!');
+    }
     var utc = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
     console.log('utc', utc);
-    const checkTrain = await db.query(`SELECT * FROM trainings WHERE date = $1`, [utc]);
-    console.log(checkTrain.rows[0]);
-    if (checkTrain.rows[0]) {
-      throw ApiError.BadRequest('Тренировка на данный день уже существует!');
-    }
-    const newTrain = await db.query(`INSERT INTO trainings(account_id) VALUES ($1) RETURNING *`, [
-      account_id,
-    ]);
+    // const checkTrain = await db.query(`SELECT * FROM trainings WHERE date = $1`, [utc]);
+    // console.log(checkTrain.rows[0]);
+    // if (checkTrain.rows[0]) {
+    //   throw ApiError.BadRequest('Тренировка на данный день уже существует!');
+    // }
+    const newTrain = await db.query(
+      `INSERT INTO trainings(account_id, day_team) VALUES ($1, $2) RETURNING *`,
+      [account_id, day_team],
+    );
     return newTrain;
   }
-  async getOneTrain(account_id, date) {
-    const train = await db.query(`SELECT * FROM trainings WHERE account_id = $1 AND date = $2`, [
-      account_id,
-      date,
-    ]);
+  async getOneTrain(account_id, date, day_team) {
+    const train = await db.query(
+      `SELECT * FROM trainings WHERE account_id = $1 AND date = $2 AND date = $2 AND day_team = $3`,
+      [account_id, date, day_team],
+    );
     return train;
   }
   async getTrains(account_id, date_start, date_end) {
