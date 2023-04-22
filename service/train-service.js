@@ -34,7 +34,9 @@ class TrainService {
       throw ApiError.UnauthorisedError();
     }
     if (!date_end) {
-      date_end = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+      let date = new Date().toLocaleString().slice(0, 10).replaceAll('.', '-');
+      let new_date = date.slice(6, 10) + '-' + date.slice(3, 5) + '-' + date.slice(0, 2);
+      date_end = new_date;
       console.log('date_end:', date_end);
     }
     if (!date_start) {
