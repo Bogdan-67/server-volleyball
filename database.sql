@@ -49,6 +49,7 @@ CREATE TABLE trainings(
     catch_sum INTEGER DEFAULT 0,
     defence_sum INTEGER DEFAULT 0,
     support_sum INTEGER DEFAULT 0,
+    day_team VARCHAR(255) NOT NULL,
     account_id INTEGER,
     FOREIGN KEY (account_id) REFERENCES accounts(id_account) ON DELETE CASCADE
     );
