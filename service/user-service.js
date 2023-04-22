@@ -38,6 +38,10 @@ class UserService {
 
   async getOneUser(id) {
     const user = await db.query(`SELECT * FROM users WHERE id_user = $1`, [id]);
+    if (!user.rows[0]) {
+      throw ApiError.BadRequest('Пользователь не найден!');
+    }
+    delete user.rows[0].id_user;
     return user;
   }
 
