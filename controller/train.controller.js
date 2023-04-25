@@ -11,6 +11,24 @@ class TrainController {
       next(e);
     }
   }
+  async addTeamTrain(req, res, next) {
+    try {
+      const { players, account_id, day_team } = req.body;
+      const newTeamTrain = await trainService.addTeamTrain(account_id, day_team, players);
+      res.status(200).json(newTeamTrain);
+    } catch (e) {
+      next(e);
+    }
+  }
+  async getTeamTrain(req, res, next) {
+    try {
+      const { date, account_id, day_team } = req.query;
+      const teamTrain = await trainService.addTeamTrain(account_id, day_team, date);
+      res.status(200).json(teamTrain.rows);
+    } catch (e) {
+      next(e);
+    }
+  }
   async getOneTrain(req, res, next) {
     try {
       const account_id = req.params.account_id;
