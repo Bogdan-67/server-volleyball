@@ -6,17 +6,23 @@ const bcrypt = require('bcrypt');
 
 class AuthService {
   async login(login, password) {
-    const user = await db.query(`SELECT * FROM accounts WHERE login = $1`, [login]);
-    if (!user.rows[0]) {
+    const account = await db.query(`SELECT * FROM accounts WHERE login = $1`, [login]);
+    if (!account.rows[0]) {
       throw ApiError.BadRequest('Пользователь с таким логином не найден!');
     }
-    const isPassEquals = await bcrypt.compare(password, user.rows[0].password);
+    const isPassEquals = await bcrypt.compare(password, account.rows[0].password);
     if (!isPassEquals) {
       throw ApiError.BadRequest('Неверный пароль!');
     }
-    const role = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [user.rows[0].role_id]);
-    const userDto = new UserDTO({ ...user.rows[0], ...role.rows[0] });
+    const role = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [
+      account.rows[0].role_id,
+    ]);
+    const user = await db.query('SELECT * FROM users WHERE id_user = $1', [
+      account.rows[0].id_user,
+    ]);
+    const userDto = new UserDTO({ ...account.rows[0], ...role.rows[0], ...user.rows[0] });
     const tokens = tokenService.generateTokens({ ...userDto });
+
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
     return { ...tokens, user: { ...userDto } };
   }
