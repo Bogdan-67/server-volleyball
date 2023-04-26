@@ -32,6 +32,7 @@ class AuthService {
       throw ApiError.UnauthorisedError();
     }
     const userData = tokenService.validateRefreshToken(refreshToken);
+    console.log('userData', userData);
     const tokenFromDb = await tokenService.findToken(refreshToken);
     if (!userData || !tokenFromDb || !userData.id_account) {
       throw ApiError.UnauthorisedError();
@@ -43,8 +44,13 @@ class AuthService {
       throw ApiError.BadRequest('Пользователь не найден!');
     }
     console.log(user.rows[0]);
+    const userRole = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [
+      user.rows[0].role_id,
+    ]);
+    console.log(userRole.rows[0]);
     const userDto = new UserDTO(user.rows[0]);
-    userDto.role = userData.role;
+    userDto.role = userRole.rows[0].role;
+    console.log('userDto', userDto);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
     return { ...tokens, user: { ...userDto } };
