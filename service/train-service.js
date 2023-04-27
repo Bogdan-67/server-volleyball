@@ -91,7 +91,7 @@ class TrainService {
   }
 
   // Получение тренировок пользователей введенной команды
-  async addTeamTrain(account_id, day_team, date) {
+  async getTeamTrain(account_id, day_team, date) {
     if (!account_id) {
       throw ApiError.UnauthorisedError();
     }
@@ -146,10 +146,89 @@ class TrainService {
 
   // Редактирование тренировки
   async editTrain() {}
+
+  // Удаление тренировки
   async deleteTrain() {}
-  async addAction() {}
+
+  // Добавление действия
+  async addAction(id_train, name_action, result, condition, score, id_action_type) {
+    const action = await db.query(
+      `INSERT INTO actions(name_action, result, condition, score, id_train, id_action_type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [name_action, result, condition, score, id_train, id_action_type],
+    );
+    console.log(action.rows);
+    const findTrain = await db.query(`SELECT * FROM trainings WHERE id_train = $1`, [id_train]);
+
+    const updTrain = async (column) => {
+      const win_count = await db.query(
+        `SELECT COUNT(*) FROM actions WHERE score=1 AND name_action=$1`,
+        [name_action],
+      );
+      const loss_count = await db.query(
+        `SELECT COUNT(*) FROM actions WHERE score=-1 AND name_action=$1`,
+        [name_action],
+      );
+      const count = await db.query(`SELECT COUNT(*) FROM actions WHERE name_action=$1`, [
+        name_action,
+      ]);
+      const stat = (win_count - loss_count) / count;
+      const upd = await db.query(`UPDATE trainings SET $1 = $2 WHERE id_train = $3`, [
+        column,
+        stat,
+        id_train,
+      ]);
+      return upd;
+    };
+
+    switch (id_action_type) {
+      // Подача
+      case 1:
+        updTrain('inning_stat');
+        break;
+      // Атака
+      case 2:
+        updTrain('attacks_stat');
+        break;
+      // Блокирование
+      case 3:
+        break;
+      // Прием подачи
+      case 4:
+        break;
+      // Защита
+      case 5:
+        break;
+      // Передача на удар
+      case 6:
+        break;
+    }
+    return action.rows[0];
+  }
+
+  // Получение действий пользователя
+  async getActions() {}
+
+  // Редактирование действия
   async editAction() {}
+
+  // Удаление действия
   async deleteAction() {}
+
+  // Добавление типа действия
+  async addActionType(name_type, result, win_condition, loss_condition, description) {
+    const actionType = await db.query(
+      `INSERT INTO action_types(name_type, result, win_condition, loss_condition, description) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [name_type, result, win_condition, loss_condition, description],
+    );
+    console.log(actionType.rows);
+    return actionType.rows[0];
+  }
+
+  // Получение типов действий
+  async getActionsTypes() {
+    const actionsTypes = await db.query(`SELECT * FROM action_types`);
+    return actionsTypes.rows;
+  }
 }
 
 module.exports = new TrainService();

@@ -23,7 +23,7 @@ class TrainController {
   async getTeamTrain(req, res, next) {
     try {
       const { date, account_id, day_team } = req.query;
-      const teamTrain = await trainService.addTeamTrain(account_id, day_team, date);
+      const teamTrain = await trainService.getTeamTrain(account_id, day_team, date);
       res.status(200).json(teamTrain.rows);
     } catch (e) {
       next(e);
@@ -75,12 +75,45 @@ class TrainController {
   }
   async addAction(req, res, next) {
     try {
+      const { id_train, name_action, result, condition, score, id_action_type } = req.body;
+      const newAction = await trainService.addAction(
+        id_train,
+        name_action,
+        result,
+        condition,
+        score,
+        id_action_type,
+      );
+      res.status(200).json(newAction);
     } catch (e) {
       next(e);
     }
   }
   async getActions(req, res, next) {
     try {
+    } catch (e) {
+      next(e);
+    }
+  }
+  async addActionType(req, res, next) {
+    try {
+      const { name_type, result, win_condition, loss_condition, description } = req.body;
+      const actionType = await trainService.addActionType(
+        name_type,
+        result,
+        win_condition,
+        loss_condition,
+        description,
+      );
+      res.status(200).json(actionType);
+    } catch (e) {
+      next(e);
+    }
+  }
+  async getActionsTypes(req, res, next) {
+    try {
+      const actionsTypes = await trainService.getActionsTypes();
+      res.status(200).json(actionsTypes);
     } catch (e) {
       next(e);
     }
