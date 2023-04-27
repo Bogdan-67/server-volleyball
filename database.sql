@@ -40,15 +40,12 @@ CREATE TABLE stats(
 CREATE TABLE trainings(
     id_train SERIAL PRIMARY KEY,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
-    inning_accyr_train REAL  DEFAULT 0,
-    stat_block_train REAL  DEFAULT 0,
-    sum_scores_train REAL DEFAULT 0,
-    inning_sum INTEGER DEFAULT 0,
-    blocks_sum INTEGER DEFAULT 0,
-    attacks_sum INTEGER DEFAULT 0,
-    catch_sum INTEGER DEFAULT 0,
-    defence_sum INTEGER DEFAULT 0,
-    support_sum INTEGER DEFAULT 0,
+    inning_stat INTEGER DEFAULT 0,
+    blocks_stat INTEGER DEFAULT 0,
+    attacks_stat INTEGER DEFAULT 0,
+    catch_stat INTEGER DEFAULT 0,
+    defence_stat INTEGER DEFAULT 0,
+    support_stat INTEGER DEFAULT 0,
     day_team VARCHAR(255) NOT NULL,
     account_id INTEGER,
     FOREIGN KEY (account_id) REFERENCES accounts(id_account) ON DELETE CASCADE
@@ -57,9 +54,9 @@ CREATE TABLE trainings(
 CREATE TABLE action_types(
     id_action_type SERIAL PRIMARY KEY,
     name_type VARCHAR(255) NOT NULL,
-    act_or_form VARCHAR(255) NOT NULL,
     result VARCHAR(255) NOT NULL,
-    condition VARCHAR(255),
+    win_condition VARCHAR(255),
+    loss_condition VARCHAR(255),
     description TEXT
     );
 
@@ -67,11 +64,11 @@ CREATE TABLE actions(
     id_action SERIAL PRIMARY KEY,
     name_action VARCHAR(255) NOT NULL,
     time TIME NOT NULL DEFAULT current_time,
-    condition VARCHAR(255) NOT NULL,
     result VARCHAR(255) NOT NULL,
-    score REAL NOT NULL,
-    train_id INTEGER,
-    FOREIGN KEY (train_id) REFERENCES trainings(id_train) ON DELETE CASCADE,
-    action_type_id INTEGER,
-    FOREIGN KEY (action_type_id) REFERENCES action_types(id_action_type) ON DELETE CASCADE
+    condition VARCHAR(255) NOT NULL,
+    score INTEGER,
+    id_train INTEGER,
+    FOREIGN KEY (id_train) REFERENCES trainings(id_train) ON DELETE CASCADE,
+    id_action_type INTEGER,
+    FOREIGN KEY (id_action_type) REFERENCES action_types(id_action_type) ON DELETE CASCADE
     );
