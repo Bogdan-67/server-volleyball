@@ -39,19 +39,23 @@ class TrainService {
     }
 
     const errors = players.map(async (item) => {
-      if (typeof item != 'object') {
-        throw ApiError.BadRequest('элемент players не является объектом!');
+      // if (typeof item != 'object') {
+      //   throw ApiError.BadRequest('элемент players не является объектом!');
+      // }
+      // if (!item.hasOwnProperty('name')) {
+      //   throw ApiError.BadRequest('в элементе players нет свойства name!');
+      // }
+      // if (!item.hasOwnProperty('surname')) {
+      //   throw ApiError.BadRequest('в элементе players нет свойства surname!');
+      // }
+      // const checkPlayer = await db.query(`SELECT * FROM users WHERE name = $1 AND surname = $2`, [
+      //   item.name,
+      //   item.surname,
+      // ]);
+      if (typeof item != 'number') {
+        throw ApiError.BadRequest('id_account не является числом!');
       }
-      if (!item.hasOwnProperty('name')) {
-        throw ApiError.BadRequest('в элементе players нет свойства name!');
-      }
-      if (!item.hasOwnProperty('surname')) {
-        throw ApiError.BadRequest('в элементе players нет свойства surname!');
-      }
-      const checkPlayer = await db.query(`SELECT * FROM users WHERE name = $1 AND surname = $2`, [
-        item.name,
-        item.surname,
-      ]);
+      const checkPlayer = await db.query(`SELECT * FROM accounts WHERE id_account = $1`, [item]);
       if (!checkPlayer.rows[0]) {
         throw ApiError.BadRequest('Введен несуществующий пользователь!');
       }
@@ -69,19 +73,23 @@ class TrainService {
 
     const newTrain = [];
 
-    const promises = players.map(async (item) => {
-      console.log('name:', item.name, 'surname', item.surname);
-      const getUser = await db.query(`SELECT * FROM users WHERE name = $1 AND surname = $2`, [
-        item.name,
-        item.surname,
-      ]);
-      console.log('user:', getUser.rows[0]);
-      const getUserAccount = await db.query(`SELECT * FROM accounts WHERE id_user = $1`, [
-        getUser.rows[0].id_user,
-      ]);
+    const promises = players.map(async (account_id) => {
+      // console.log('name:', item.name, 'surname', item.surname);
+      // const getUser = await db.query(`SELECT * FROM users WHERE name = $1 AND surname = $2`, [
+      //   item.name,
+      //   item.surname,
+      // ]);
+      // console.log('user:', getUser.rows[0]);
+      // const getUserAccount = await db.query(`SELECT * FROM accounts WHERE id_user = $1`, [
+      //   getUser.rows[0].id_user,
+      // ]);
+      // const newUserTrain = await db.query(
+      //   `INSERT INTO trainings(account_id, day_team) VALUES ($1, $2) RETURNING *`,
+      //   [getUserAccount.rows[0].id_account, day_team],
+      // );
       const newUserTrain = await db.query(
         `INSERT INTO trainings(account_id, day_team) VALUES ($1, $2) RETURNING *`,
-        [getUserAccount.rows[0].id_account, day_team],
+        [account_id, day_team],
       );
       newTrain.push(newUserTrain.rows[0]);
     });

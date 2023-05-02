@@ -13,7 +13,8 @@ class TrainController {
   }
   async addTeamTrain(req, res, next) {
     try {
-      const { players, account_id, day_team } = req.body;
+      const { account_id, day_team, players } = req.body;
+      console.log(account_id, day_team, players);
       const newTeamTrain = await trainService.addTeamTrain(account_id, day_team, players);
       res.status(200).json(newTeamTrain);
     } catch (e) {
