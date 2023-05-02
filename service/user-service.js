@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const tokenService = require('../service/token-service');
 const UserDTO = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
+const SelectUsersDTO = require('../dtos/selectUsers-dto');
 
 class UserService {
   async createUser({ name, surname, patronimyc, phone, email, login, password, team }) {
@@ -46,8 +47,15 @@ class UserService {
   }
 
   async getUsers(req, res) {
-    const users = await db.query('SELECT * FROM users');
-    return users;
+    const users = await db.query(
+      'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user',
+    );
+    const usersArr = users.rows.map((item) => {
+      const user = new SelectUsersDTO(item);
+      return { ...user };
+    });
+    console.log('Users', usersArr);
+    return usersArr;
   }
 
   async updateUser({ name, surname, patronimyc, phone, email }, id) {
