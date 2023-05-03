@@ -118,6 +118,18 @@ class TrainService {
     return train;
   }
 
+  // Получение тренировок пользователей введенной команды
+  async checkTeam(team) {
+    const utc = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+    const teamData = await db.query(`SELECT * FROM trainings WHERE day_team = $1 AND date = $2`, [
+      team,
+      utc,
+    ]);
+    console.log('teamData', teamData);
+    if (teamData.rows[0]) return false;
+    else return true;
+  }
+
   // Получение тренировки пользователя по команде и дате
   async getOneTrain(account_id, date, day_team) {
     const train = await db.query(

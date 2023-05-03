@@ -30,6 +30,15 @@ class TrainController {
       next(e);
     }
   }
+  async checkTeam(req, res, next) {
+    try {
+      const { team } = req.params;
+      const teamTrain = await trainService.checkTeam(team);
+      res.status(200).json(teamTrain);
+    } catch (e) {
+      next(e);
+    }
+  }
   async getOneTrain(req, res, next) {
     try {
       const account_id = req.params.account_id;
