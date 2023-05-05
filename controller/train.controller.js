@@ -25,7 +25,7 @@ class TrainController {
     try {
       const { date, account_id, day_team } = req.query;
       const teamTrain = await trainService.getTeamTrain(account_id, day_team, date);
-      res.status(200).json(teamTrain.rows);
+      res.status(200).json(teamTrain);
     } catch (e) {
       next(e);
     }

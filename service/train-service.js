@@ -1,4 +1,5 @@
 const db = require('../db');
+const TrainDTO = require('../dtos/train-dto');
 const ApiError = require('../exceptions/api-error');
 
 class TrainService {
@@ -39,19 +40,6 @@ class TrainService {
     }
 
     const errors = players.map(async (item) => {
-      // if (typeof item != 'object') {
-      //   throw ApiError.BadRequest('элемент players не является объектом!');
-      // }
-      // if (!item.hasOwnProperty('name')) {
-      //   throw ApiError.BadRequest('в элементе players нет свойства name!');
-      // }
-      // if (!item.hasOwnProperty('surname')) {
-      //   throw ApiError.BadRequest('в элементе players нет свойства surname!');
-      // }
-      // const checkPlayer = await db.query(`SELECT * FROM users WHERE name = $1 AND surname = $2`, [
-      //   item.name,
-      //   item.surname,
-      // ]);
       if (typeof item != 'number') {
         throw ApiError.BadRequest('id_account не является числом!');
       }
@@ -74,24 +62,12 @@ class TrainService {
     const newTrain = [];
 
     const promises = players.map(async (account_id) => {
-      // console.log('name:', item.name, 'surname', item.surname);
-      // const getUser = await db.query(`SELECT * FROM users WHERE name = $1 AND surname = $2`, [
-      //   item.name,
-      //   item.surname,
-      // ]);
-      // console.log('user:', getUser.rows[0]);
-      // const getUserAccount = await db.query(`SELECT * FROM accounts WHERE id_user = $1`, [
-      //   getUser.rows[0].id_user,
-      // ]);
-      // const newUserTrain = await db.query(
-      //   `INSERT INTO trainings(account_id, day_team) VALUES ($1, $2) RETURNING *`,
-      //   [getUserAccount.rows[0].id_account, day_team],
-      // );
       const newUserTrain = await db.query(
         `INSERT INTO trainings(account_id, day_team) VALUES ($1, $2) RETURNING *`,
         [account_id, day_team],
       );
-      newTrain.push(newUserTrain.rows[0]);
+      const newUserTrainDto = new TrainDTO(newUserTrain.rows[0]);
+      newTrain.push(newUserTrainDto);
     });
     await Promise.all(promises);
 
@@ -115,7 +91,9 @@ class TrainService {
       [day_team, date],
     );
 
-    return train;
+    const trainDto = train.rows.map((obj) => new TrainDTO(obj));
+
+    return trainDto;
   }
 
   // Получение тренировок пользователей введенной команды
@@ -184,17 +162,25 @@ class TrainService {
         `SELECT COUNT(*) FROM actions WHERE score=1 AND name_action=$1`,
         [name_action],
       );
+      const winCNum = Number(win_count.rows[0].count);
+      console.log('winCNum', winCNum);
       const loss_count = await db.query(
         `SELECT COUNT(*) FROM actions WHERE score=-1 AND name_action=$1`,
         [name_action],
       );
+      const lossCNum = Number(loss_count.rows[0].count);
+      console.log('lossCNum', lossCNum);
       const count = await db.query(`SELECT COUNT(*) FROM actions WHERE name_action=$1`, [
         name_action,
       ]);
-      const stat = (win_count - loss_count) / count;
-      const upd = await db.query(`UPDATE trainings SET $1 = $2 WHERE id_train = $3`, [
-        column,
-        stat,
+      const cNum = Number(count.rows[0].count);
+      console.log('cNum', cNum);
+      const stat = (winCNum - lossCNum) / cNum > 0 ? (winCNum - lossCNum) / cNum : 0;
+      console.log('stat', stat);
+      const statFixed = +stat.toFixed(2);
+      console.log('statFixed', statFixed);
+      const upd = await db.query(`UPDATE trainings SET ${column} = $1 WHERE id_train = $2`, [
+        statFixed,
         id_train,
       ]);
       return upd;
@@ -205,21 +191,25 @@ class TrainService {
       case 1:
         updTrain('inning_stat');
         break;
-      // Атака
-      case 2:
-        updTrain('attacks_stat');
-        break;
       // Блокирование
+      case 2:
+        updTrain('blocks_stat');
+        break;
+      // Атака
       case 3:
+        updTrain('attacks_stat');
         break;
       // Прием подачи
       case 4:
+        updTrain('catch_stat');
         break;
       // Защита
       case 5:
+        updTrain('defence_stat');
         break;
       // Передача на удар
       case 6:
+        updTrain('support_stat');
         break;
     }
     return action.rows[0];
