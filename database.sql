@@ -15,7 +15,7 @@ CREATE TABLE roles(
 
 CREATE TABLE accounts(
     id_account SERIAL PRIMARY KEY,
-    login VARCHAR(255) NOT NULL,
+    login VARCHAR(255) NOT NULL,   
     password VARCHAR(255) NOT NULL,
     role_id INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY (role_id) REFERENCES roles(id_role) ON DELETE CASCADE,
@@ -40,12 +40,12 @@ CREATE TABLE stats(
 CREATE TABLE trainings(
     id_train SERIAL PRIMARY KEY,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
-    inning_stat INTEGER DEFAULT 0,
-    blocks_stat INTEGER DEFAULT 0,
-    attacks_stat INTEGER DEFAULT 0,
-    catch_stat INTEGER DEFAULT 0,
-    defence_stat INTEGER DEFAULT 0,
-    support_stat INTEGER DEFAULT 0,
+    inning_stat REAL DEFAULT 0,
+    blocks_stat REAL DEFAULT 0,
+    attacks_stat REAL DEFAULT 0,
+    catch_stat REAL DEFAULT 0,
+    defence_stat REAL DEFAULT 0,
+    support_stat REAL DEFAULT 0,
     day_team VARCHAR(255) NOT NULL,
     account_id INTEGER,
     FOREIGN KEY (account_id) REFERENCES accounts(id_account) ON DELETE CASCADE
