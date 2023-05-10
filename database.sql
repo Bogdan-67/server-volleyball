@@ -65,7 +65,7 @@ CREATE TABLE actions(
     name_action VARCHAR(255) NOT NULL,
     time TIME NOT NULL DEFAULT current_time,
     result VARCHAR(255) NOT NULL,
-    condition VARCHAR(255) NOT NULL,
+    condition VARCHAR(255),
     score INTEGER,
     id_train INTEGER,
     FOREIGN KEY (id_train) REFERENCES trainings(id_train) ON DELETE CASCADE,
