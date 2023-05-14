@@ -6,6 +6,7 @@ const authMiddleware = require('../middlewares/auth-middleware');
 router.post('/train', authMiddleware, trainController.addTrain);
 router.post('/team-train', authMiddleware, trainController.addTeamTrain);
 router.get('/team-train', authMiddleware, trainController.getTeamTrain);
+router.get('/teams', authMiddleware, trainController.getTeams);
 router.get('/team/:team', authMiddleware, trainController.checkTeam);
 router.get('/trains/:account_id', authMiddleware, trainController.getTrains);
 router.get('/train/:account_id', authMiddleware, trainController.getOneTrain);

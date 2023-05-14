@@ -98,12 +98,16 @@ class TrainService {
       [day_team, date],
     );
 
+    if (!train.rows[0]) {
+      throw ApiError.BadRequest('Тренировка не найдена.');
+    }
+
     const trainDto = train.rows.map((obj) => new TrainDTO(obj));
 
     return trainDto;
   }
 
-  // Получение тренировок пользователей введенной команды
+  // Проверка на наличие у команды тренировки на сегодня
   async checkTeam(team) {
     const utc = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
     const teamData = await db.query(`SELECT * FROM trainings WHERE day_team = $1 AND date = $2`, [
@@ -112,6 +116,16 @@ class TrainService {
     ]);
     if (teamData.rows[0]) return false;
     else return true;
+  }
+
+  // Получение списка всех команд
+  async getTeams() {
+    const teams = await db.query(`SELECT DISTINCT day_team FROM trainings`);
+    const res = teams.rows.map((obj) => {
+      const team = obj.day_team;
+      return team;
+    });
+    return res;
   }
 
   // Получение тренировки пользователя по команде и дате
