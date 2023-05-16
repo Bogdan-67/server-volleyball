@@ -98,6 +98,10 @@ class TrainService {
       [day_team, date],
     );
 
+    if (!train.rows[0]) {
+      throw ApiError.BadRequest('Тренировка не найдена.');
+    }
+
     const trainDto = train.rows.map((obj) => new TrainDTO(obj));
 
     return trainDto;
