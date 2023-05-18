@@ -45,7 +45,7 @@ class AuthService {
     const account = await db.query(`SELECT * FROM accounts WHERE id_account = $1`, [
       userData.id_account,
     ]);
-    const user = await db.query('SELECT * FROM users WHERE id_user = $1', [userData.id_account]);
+    const user = await db.query('SELECT * FROM users WHERE id_user = $1', [userData.id_user]);
     if (!user.rows[0]) {
       throw ApiError.BadRequest('Пользователь не найден!');
     }
