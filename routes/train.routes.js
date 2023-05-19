@@ -15,6 +15,7 @@ router.delete('/train', authMiddleware, trainController.deleteTrain);
 
 router.post('/action', authMiddleware, trainController.addAction);
 router.get('/actions', authMiddleware, trainController.getActions);
+router.get('/train-actions', authMiddleware, trainController.getTrainActions);
 router.post('/action-types', authMiddleware, trainController.addActionType);
 router.get('/action-types', authMiddleware, trainController.getActionsTypes);
 router.put('/action', authMiddleware, trainController.editAction);

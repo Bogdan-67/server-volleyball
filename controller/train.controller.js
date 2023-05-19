@@ -93,7 +93,8 @@ class TrainController {
   }
   async addAction(req, res, next) {
     try {
-      const { id_train, name_action, result, condition, score, id_action_type } = req.body;
+      const { id_train, name_action, result, condition, score, id_action_type, date, day_team } =
+        req.body;
       const newAction = await trainService.addAction(
         id_train,
         name_action,
@@ -101,7 +102,10 @@ class TrainController {
         condition,
         score,
         id_action_type,
+        date,
+        day_team,
       );
+      console.log(newAction);
       res.status(200).json(newAction);
     } catch (e) {
       next(e);
@@ -109,6 +113,15 @@ class TrainController {
   }
   async getActions(req, res, next) {
     try {
+    } catch (e) {
+      next(e);
+    }
+  }
+  async getTrainActions(req, res, next) {
+    try {
+      const { date, day_team } = req.query;
+      const trainActions = await trainService.getTrainActions(date, day_team);
+      res.status(200).json(trainActions);
     } catch (e) {
       next(e);
     }

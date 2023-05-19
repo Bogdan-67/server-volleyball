@@ -1,4 +1,5 @@
 const db = require('../db');
+const ActionDTO = require('../dtos/action-dto');
 const ActionTypeDto = require('../dtos/actionType-dto');
 const TrainDTO = require('../dtos/train-dto');
 const ApiError = require('../exceptions/api-error');
@@ -169,12 +170,13 @@ class TrainService {
   async deleteTrain() {}
 
   // Добавление действия
-  async addAction(id_train, name_action, result, condition, score, id_action_type) {
+  async addAction(id_train, name_action, result, condition, score, id_action_type, date, day_team) {
     const action = await db.query(
-      `INSERT INTO actions(name_action, result, condition, score, id_train, id_action_type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [name_action, result, condition, score, id_train, id_action_type],
+      `INSERT INTO actions(name_action, result, condition, score, id_train, id_action_type, date, day_team) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [name_action, result, condition, score, id_train, id_action_type, date, day_team],
     );
     console.log(action.rows);
+    console.log('id_train', id_train);
 
     const updTrain = async (column) => {
       const win_count = await db.query(
@@ -198,19 +200,27 @@ class TrainService {
       console.log('stat', stat);
       const statFixed = +stat.toFixed(2);
       console.log('statFixed', statFixed);
+      console.log('id_train', id_train);
       const upd = await db.query(
         `UPDATE trainings SET ${column} = $1 WHERE id_train = $2 RETURNING *`,
         [statFixed, id_train],
       );
-      return upd;
+      console.log('upd', upd.rows);
+      return upd.rows[0];
     };
 
-    let upd = {};
+    let upd = { initial: 'initial' };
 
     switch (id_action_type) {
       // Подача
       case 1:
-        upd = updTrain('inning_stat');
+        await updTrain('inning_stat')
+          .then((data) => {
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
         break;
       // Блокирование
       case 2:
@@ -233,7 +243,26 @@ class TrainService {
         upd = updTrain('support_stat');
         break;
     }
-    return upd;
+    console.log('id', upd);
+    const user = await db.query(
+      `SELECT * FROM accounts LEFT JOIN users ON accounts.id_user = users.id_user WHERE id_account = $1`,
+      [upd.account_id],
+    );
+    return new TrainDTO({ ...user.rows[0], ...upd });
+  }
+
+  // Получение действий пользователя
+  async getTrainActions(date, day_team) {
+    const data = await db.query(
+      `SELECT * FROM actions LEFT JOIN trainings ON trainings.id_train = actions.id_train LEFT JOIN accounts ON accounts.id_account = trainings.account_id LEFT JOIN users ON accounts.id_user = users.id_user WHERE actions.date = $1 AND actions.day_team = $2`,
+      [date, day_team],
+    );
+
+    const actions = data.rows.map((action) => {
+      return new ActionDTO({ ...action });
+    });
+    console.log('actions', actions);
+    return actions;
   }
 
   // Получение действий пользователя
