@@ -67,6 +67,8 @@ CREATE TABLE actions(
     result VARCHAR(255) NOT NULL,
     condition VARCHAR(255),
     score INTEGER,
+    day_team VARCHAR(255) NOT NULL,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
     id_train INTEGER,
     FOREIGN KEY (id_train) REFERENCES trainings(id_train) ON DELETE CASCADE,
     id_action_type INTEGER,
