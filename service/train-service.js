@@ -309,115 +309,117 @@ class TrainService {
     console.log(action.rows);
     console.log('id_train', id_train);
 
-    const updTrain = async (column) => {
-      const win_count = await db.query(
-        `SELECT COUNT(*) FROM actions WHERE score=1 AND name_action=$1 AND id_train = $2`,
-        [name_action, id_train],
-      );
-      const winCNum = Number(win_count.rows[0].count);
-      console.log('winCNum', winCNum);
-      const loss_count = await db.query(
-        `SELECT COUNT(*) FROM actions WHERE score=-1 AND name_action=$1 AND id_train = $2`,
-        [name_action, id_train],
-      );
-      const lossCNum = Number(loss_count.rows[0].count);
-      console.log('lossCNum', lossCNum);
-      const count = await db.query(
-        `SELECT COUNT(*) FROM actions WHERE name_action=$1 AND id_train=$2`,
-        [name_action, id_train],
-      );
-      const cNum = Number(count.rows[0].count);
-      console.log('cNum', cNum);
-      const stat = (winCNum - lossCNum) / cNum > 0 ? (winCNum - lossCNum) / cNum : 0;
-      console.log('stat', stat);
-      const statFixed = +stat.toFixed(2);
-      console.log('statFixed', statFixed, typeof statFixed);
-      console.log('id_train', id_train);
-      const upd = await db.query(
-        `UPDATE trainings SET ${column} = $1 WHERE id_train = $2 RETURNING *`,
-        [statFixed, id_train],
-      );
-      console.log('upd', upd.rows);
-      return upd.rows[0];
-    };
+    // const updTrain = async (column) => {
+    //   const win_count = await db.query(
+    //     `SELECT COUNT(*) FROM actions WHERE score=1 AND name_action=$1 AND id_train = $2`,
+    //     [name_action, id_train],
+    //   );
+    //   const winCNum = Number(win_count.rows[0].count);
+    //   console.log('winCNum', winCNum);
+    //   const loss_count = await db.query(
+    //     `SELECT COUNT(*) FROM actions WHERE score=-1 AND name_action=$1 AND id_train = $2`,
+    //     [name_action, id_train],
+    //   );
+    //   const lossCNum = Number(loss_count.rows[0].count);
+    //   console.log('lossCNum', lossCNum);
+    //   const count = await db.query(
+    //     `SELECT COUNT(*) FROM actions WHERE name_action=$1 AND id_train=$2`,
+    //     [name_action, id_train],
+    //   );
+    //   const cNum = Number(count.rows[0].count);
+    //   console.log('cNum', cNum);
+    //   const stat = (winCNum - lossCNum) / cNum > 0 ? (winCNum - lossCNum) / cNum : 0;
+    //   console.log('stat', stat);
+    //   const statFixed = +stat.toFixed(2);
+    //   console.log('statFixed', statFixed, typeof statFixed);
+    //   console.log('id_train', id_train);
+    //   const upd = await db.query(
+    //     `UPDATE trainings SET ${column} = $1 WHERE id_train = $2 RETURNING *`,
+    //     [statFixed, id_train],
+    //   );
+    //   console.log('upd', upd.rows);
+    //   return upd.rows[0];
+    // };
 
-    let upd = { initial: 'initial' };
+    // let upd = { initial: 'initial' };
 
-    switch (id_action_type) {
-      // Подача
-      case 1:
-        await updTrain('inning_stat')
-          .then((data) => {
-            console.log('data', data);
-            upd = data;
-          })
-          .catch((err) => {
-            throw ApiError.BadRequest('Ошибка базы данных');
-          });
-        break;
-      // Атака
-      case 2:
-        await updTrain('attacks_stat')
-          .then((data) => {
-            console.log('data', data);
-            upd = data;
-          })
-          .catch((err) => {
-            throw ApiError.BadRequest('Ошибка базы данных');
-          });
-        break;
-      // Блокирование
-      case 3:
-        await updTrain('blocks_stat')
-          .then((data) => {
-            console.log('data', data);
-            upd = data;
-          })
-          .catch((err) => {
-            throw ApiError.BadRequest('Ошибка базы данных');
-          });
-        break;
-      // Прием подачи
-      case 4:
-        await updTrain('catch_stat')
-          .then((data) => {
-            console.log('data', data);
-            upd = data;
-          })
-          .catch((err) => {
-            throw ApiError.BadRequest('Ошибка базы данных');
-          });
-        break;
-      // Защита
-      case 5:
-        await updTrain('defence_stat')
-          .then((data) => {
-            console.log('data', data);
-            upd = data;
-          })
-          .catch((err) => {
-            throw ApiError.BadRequest('Ошибка базы данных');
-          });
-        break;
-      // Передача на удар
-      case 6:
-        await updTrain('support_stat')
-          .then((data) => {
-            console.log('data', data);
-            upd = data;
-          })
-          .catch((err) => {
-            throw ApiError.BadRequest('Ошибка базы данных');
-          });
-        break;
-    }
-    console.log('id', upd);
-    const user = await db.query(
-      `SELECT * FROM accounts LEFT JOIN users ON accounts.id_user = users.id_user WHERE id_account = $1`,
-      [upd.account_id],
-    );
-    console.log('user', user.rows);
-    return new TrainDTO({ ...user.rows[0], ...upd });
+    // switch (id_action_type) {
+    //   // Подача
+    //   case 1:
+    //     await updTrain('inning_stat')
+    //       .then((data) => {
+    //         console.log('data', data);
+    //         upd = data;
+    //       })
+    //       .catch((err) => {
+    //         throw ApiError.BadRequest('Ошибка базы данных');
+    //       });
+    //     break;
+    //   // Атака
+    //   case 2:
+    //     await updTrain('attacks_stat')
+    //       .then((data) => {
+    //         console.log('data', data);
+    //         upd = data;
+    //       })
+    //       .catch((err) => {
+    //         throw ApiError.BadRequest('Ошибка базы данных');
+    //       });
+    //     break;
+    //   // Блокирование
+    //   case 3:
+    //     await updTrain('blocks_stat')
+    //       .then((data) => {
+    //         console.log('data', data);
+    //         upd = data;
+    //       })
+    //       .catch((err) => {
+    //         throw ApiError.BadRequest('Ошибка базы данных');
+    //       });
+    //     break;
+    //   // Прием подачи
+    //   case 4:
+    //     await updTrain('catch_stat')
+    //       .then((data) => {
+    //         console.log('data', data);
+    //         upd = data;
+    //       })
+    //       .catch((err) => {
+    //         throw ApiError.BadRequest('Ошибка базы данных');
+    //       });
+    //     break;
+    //   // Защита
+    //   case 5:
+    //     await updTrain('defence_stat')
+    //       .then((data) => {
+    //         console.log('data', data);
+    //         upd = data;
+    //       })
+    //       .catch((err) => {
+    //         throw ApiError.BadRequest('Ошибка базы данных');
+    //       });
+    //     break;
+    //   // Передача на удар
+    //   case 6:
+    //     await updTrain('support_stat')
+    //       .then((data) => {
+    //         console.log('data', data);
+    //         upd = data;
+    //       })
+    //       .catch((err) => {
+    //         throw ApiError.BadRequest('Ошибка базы данных');
+    //       });
+    //     break;
+    // }
+    // console.log('id', upd);
+    // const user = await db.query(
+    //   `SELECT * FROM accounts LEFT JOIN users ON accounts.id_user = users.id_user WHERE id_account = $1`,
+    //   [upd.account_id],
+    // );
+    // console.log('user', user.rows);
+    // return new TrainDTO({ ...user.rows[0], ...upd });
+
+    return this.calculateTrain(id_action_type, id_train, name_action);
   }
 
   // Удаление действия
