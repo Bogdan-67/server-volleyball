@@ -180,20 +180,21 @@ class TrainService {
 
     const updTrain = async (column) => {
       const win_count = await db.query(
-        `SELECT COUNT(*) FROM actions WHERE score=1 AND name_action=$1`,
-        [name_action],
+        `SELECT COUNT(*) FROM actions WHERE score=1 AND name_action=$1 AND id_train = $2`,
+        [name_action, id_train],
       );
       const winCNum = Number(win_count.rows[0].count);
       console.log('winCNum', winCNum);
       const loss_count = await db.query(
-        `SELECT COUNT(*) FROM actions WHERE score=-1 AND name_action=$1`,
-        [name_action],
+        `SELECT COUNT(*) FROM actions WHERE score=-1 AND name_action=$1 AND id_train = $2`,
+        [name_action, id_train],
       );
       const lossCNum = Number(loss_count.rows[0].count);
       console.log('lossCNum', lossCNum);
-      const count = await db.query(`SELECT COUNT(*) FROM actions WHERE name_action=$1`, [
-        name_action,
-      ]);
+      const count = await db.query(
+        `SELECT COUNT(*) FROM actions WHERE name_action=$1 AND id_train=$2`,
+        [name_action, id_train],
+      );
       const cNum = Number(count.rows[0].count);
       console.log('cNum', cNum);
       const stat = (winCNum - lossCNum) / cNum > 0 ? (winCNum - lossCNum) / cNum : 0;
