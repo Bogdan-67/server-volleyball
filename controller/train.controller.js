@@ -79,15 +79,16 @@ class TrainController {
       next(e);
     }
   }
-  // async getTrainsByDate(req, res, next) {
-  //   try {
-  //     const { date_start, date_end, account_id } = req.params;
-  //     const trains = await trainService.getTrainsByDate(date_start, date_end);
-  //     res.status(200).json(trains.rows);
-  //   } catch (e) {
-  //     next(e);
-  //   }
-  // }
+  async getTeamRangeStat(req, res, next) {
+    try {
+      const { date_start, date_end, account_id, day_team } = req.query;
+      console.log(req.query);
+      const stat = await trainService.getTeamRangeStat(account_id, day_team, date_start, date_end);
+      res.status(200).json(stat);
+    } catch (e) {
+      next(e);
+    }
+  }
   async editTrain(req, res, next) {
     try {
     } catch (e) {
