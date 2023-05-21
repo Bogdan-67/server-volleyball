@@ -8,6 +8,7 @@ module.exports = class ActionDTO {
   date;
   id_train;
   id_action_type;
+  score;
   fio;
 
   constructor(model) {
@@ -20,6 +21,7 @@ module.exports = class ActionDTO {
     this.day_team = model.day_team;
     this.date = model.date;
     this.id_action_type = model.id_action_type;
+    this.score = model.score;
     this.id_train = model.id_train;
   }
 };

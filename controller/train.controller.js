@@ -30,6 +30,15 @@ class TrainController {
       next(e);
     }
   }
+  async getTeamDates(req, res, next) {
+    try {
+      const { day_team } = req.query;
+      const dates = await trainService.getTeamDates(day_team);
+      res.status(200).json(dates);
+    } catch (e) {
+      next(e);
+    }
+  }
   async checkTeam(req, res, next) {
     try {
       const { team } = req.params;
@@ -105,7 +114,7 @@ class TrainController {
         date,
         day_team,
       );
-      console.log(newAction);
+      console.log('newAction', newAction);
       res.status(200).json(newAction);
     } catch (e) {
       next(e);
@@ -122,6 +131,15 @@ class TrainController {
       const { date, day_team } = req.query;
       const trainActions = await trainService.getTrainActions(date, day_team);
       res.status(200).json(trainActions);
+    } catch (e) {
+      next(e);
+    }
+  }
+  async deleteTrainAction(req, res, next) {
+    try {
+      const { id_action } = req.query;
+      const updTrain = await trainService.deleteTrainAction(id_action);
+      res.status(200).json(updTrain);
     } catch (e) {
       next(e);
     }

@@ -108,6 +108,24 @@ class TrainService {
     return trainDto;
   }
 
+  // Получение дат тренировок команды
+  async getTeamDates(day_team) {
+    if (!day_team) {
+      throw ApiError.BadRequest('Не введено название команды!');
+    }
+
+    const data = await db.query(`SELECT DISTINCT date FROM trainings WHERE day_team = $1`, [
+      day_team,
+    ]);
+    console.log(data.rows);
+
+    const dates = data.rows.map((obj) => {
+      return obj.date;
+    });
+
+    return dates;
+  }
+
   // Проверка на наличие у команды тренировки на сегодня
   async checkTeam(team) {
     const utc = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
@@ -169,6 +187,119 @@ class TrainService {
   // Удаление тренировки
   async deleteTrain() {}
 
+  // Перерасчет столбца статистики
+  async calculateTrain(id_action_type, id_train, name_action) {
+    const updTrain = async (column) => {
+      const win_count = await db.query(
+        `SELECT COUNT(*) FROM actions WHERE score=1 AND name_action=$1 AND id_train = $2`,
+        [name_action, id_train],
+      );
+      const winCNum = Number(win_count.rows[0].count);
+      console.log('winCNum', winCNum);
+      const loss_count = await db.query(
+        `SELECT COUNT(*) FROM actions WHERE score=-1 AND name_action=$1 AND id_train = $2`,
+        [name_action, id_train],
+      );
+      const lossCNum = Number(loss_count.rows[0].count);
+      console.log('lossCNum', lossCNum);
+      const count = await db.query(
+        `SELECT COUNT(*) FROM actions WHERE name_action=$1 AND id_train=$2`,
+        [name_action, id_train],
+      );
+      const cNum = Number(count.rows[0].count);
+      console.log('cNum', cNum);
+      const stat = (winCNum - lossCNum) / cNum > 0 ? (winCNum - lossCNum) / cNum : 0;
+      console.log('stat', stat);
+      const statFixed = +stat.toFixed(2);
+      console.log('statFixed', statFixed, typeof statFixed);
+      console.log('id_train', id_train);
+      const upd = await db.query(
+        `UPDATE trainings SET ${column} = $1 WHERE id_train = $2 RETURNING *`,
+        [statFixed, id_train],
+      );
+      console.log('upd', upd.rows);
+      return upd.rows[0];
+    };
+
+    let upd = { initial: 'initial' };
+
+    switch (id_action_type) {
+      // Подача
+      case 1:
+        await updTrain('inning_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
+        break;
+      // Атака
+      case 2:
+        await updTrain('attacks_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
+        break;
+      // Блокирование
+      case 3:
+        await updTrain('blocks_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
+        break;
+      // Прием подачи
+      case 4:
+        await updTrain('catch_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
+        break;
+      // Защита
+      case 5:
+        await updTrain('defence_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
+        break;
+      // Передача на удар
+      case 6:
+        await updTrain('support_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
+        break;
+    }
+    console.log('id', upd);
+    const user = await db.query(
+      `SELECT * FROM accounts LEFT JOIN users ON accounts.id_user = users.id_user WHERE id_account = $1`,
+      [upd.account_id],
+    );
+    console.log('user', user.rows);
+    return new TrainDTO({ ...user.rows[0], ...upd });
+  }
+
   // Добавление действия
   async addAction(id_train, name_action, result, condition, score, id_action_type, date, day_team) {
     const action = await db.query(
@@ -200,7 +331,7 @@ class TrainService {
       const stat = (winCNum - lossCNum) / cNum > 0 ? (winCNum - lossCNum) / cNum : 0;
       console.log('stat', stat);
       const statFixed = +stat.toFixed(2);
-      console.log('statFixed', statFixed);
+      console.log('statFixed', statFixed, typeof statFixed);
       console.log('id_train', id_train);
       const upd = await db.query(
         `UPDATE trainings SET ${column} = $1 WHERE id_train = $2 RETURNING *`,
@@ -217,6 +348,18 @@ class TrainService {
       case 1:
         await updTrain('inning_stat')
           .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
+        break;
+      // Атака
+      case 2:
+        await updTrain('attacks_stat')
+          .then((data) => {
+            console.log('data', data);
             upd = data;
           })
           .catch((err) => {
@@ -224,24 +367,48 @@ class TrainService {
           });
         break;
       // Блокирование
-      case 2:
-        upd = updTrain('blocks_stat');
-        break;
-      // Атака
       case 3:
-        upd = updTrain('attacks_stat');
+        await updTrain('blocks_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
         break;
       // Прием подачи
       case 4:
-        upd = updTrain('catch_stat');
+        await updTrain('catch_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
         break;
       // Защита
       case 5:
-        upd = updTrain('defence_stat');
+        await updTrain('defence_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
         break;
       // Передача на удар
       case 6:
-        upd = updTrain('support_stat');
+        await updTrain('support_stat')
+          .then((data) => {
+            console.log('data', data);
+            upd = data;
+          })
+          .catch((err) => {
+            throw ApiError.BadRequest('Ошибка базы данных');
+          });
         break;
     }
     console.log('id', upd);
@@ -249,7 +416,21 @@ class TrainService {
       `SELECT * FROM accounts LEFT JOIN users ON accounts.id_user = users.id_user WHERE id_account = $1`,
       [upd.account_id],
     );
+    console.log('user', user.rows);
     return new TrainDTO({ ...user.rows[0], ...upd });
+  }
+
+  // Удаление действия
+  async deleteTrainAction(id_action) {
+    const deletedAction = await db.query(`SELECT * FROM actions WHERE id_action = $1`, [id_action]);
+
+    await db.query(`DELETE FROM actions WHERE id_action = $1`, [id_action]);
+
+    return this.calculateTrain(
+      deletedAction.rows[0].id_action_type,
+      deletedAction.rows[0].id_train,
+      deletedAction.rows[0].name_action,
+    );
   }
 
   // Получение действий пользователя
@@ -262,7 +443,6 @@ class TrainService {
     const actions = data.rows.map((action) => {
       return new ActionDTO({ ...action });
     });
-    console.log('actions', actions);
     return actions;
   }
 
@@ -292,7 +472,6 @@ class TrainService {
       const actionType = new ActionTypeDto(item);
       return { ...actionType };
     });
-    console.log(actionsTypesDto);
     return actionsTypesDto;
   }
 }
