@@ -84,6 +84,7 @@ class TrainController {
       const { date_start, date_end, account_id, day_team } = req.query;
       console.log(req.query);
       const stat = await trainService.getTeamRangeStat(account_id, day_team, date_start, date_end);
+      console.log('stat before send', stat);
       res.status(200).json(stat);
     } catch (e) {
       next(e);

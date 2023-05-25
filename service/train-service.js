@@ -210,13 +210,93 @@ class TrainService {
       return obj.account_id;
     });
 
+    let actionsTypes = await db.query(`SELECT * FROM action_types`);
+    actionsTypes = actionsTypes.rows.map((obj) => {
+      const newObj = {
+        id_action_type: obj.id_action_type,
+        name_type: obj.name_type,
+      };
+      return newObj;
+    });
+    console.log('actionsTypes', actionsTypes);
+
     const stat = players.map(async (player) => {
-      const trains = await db.query(`SELECT id_train FROM trainings WHERE account_id = $1`, [
-        account_id,
-      ]);
+      let playerStat = {
+        fio: '',
+        inning_stat: 0,
+        attacks_stat: 0,
+        blocks_stat: 0,
+        catch_stat: 0,
+        defence_stat: 0,
+        support_stat: 0,
+      };
+      const fioQuery = await db.query(
+        `SELECT name, surname, patronimyc FROM users LEFT JOIN accounts ON accounts.id_user = users.id_user WHERE id_account = $1`,
+        [player],
+      );
+      const fio =
+        fioQuery.rows[0].surname + ' ' + fioQuery.rows[0].name + ' ' + fioQuery.rows[0].patronimyc;
+      console.log('fio', fio);
+      playerStat['fio'] = fio;
+      for (let i = 1; i <= actionsTypes.length; i++) {
+        const actions = await db.query(
+          `SELECT * FROM actions WHERE id_action_type = $1 AND account_id = $2 AND day_team = $3 AND date BETWEEN $4 AND $5`,
+          [i, player, day_team, date_start, date_end],
+        );
+        console.log('actions', actions.rows);
+        const winCount = actions.rows.filter((obj) => obj.score === 1).length;
+        const lossCount = actions.rows.filter((obj) => obj.score === -1).length;
+        const count = actions.rows.length;
+
+        const actionStat = (winCount - lossCount) / count > 0 ? (winCount - lossCount) / count : 0;
+        console.log('actionStat', actionStat);
+        const actionStatFixed = +actionStat.toFixed(2);
+        console.log('actionStatFixed', actionStatFixed);
+
+        // const nameAction = actionsTypes.filter((obj) => obj.id_action_type === i)[0].name_type;
+        // playerStat[nameAction] = actionStatFixed;
+
+        switch (i) {
+          // Подача
+          case 1:
+            playerStat.inning_stat = actionStatFixed;
+            break;
+          // Атака
+          case 2:
+            playerStat.attacks_stat = actionStatFixed;
+            break;
+          // Блокирование
+          case 3:
+            playerStat.blocks_stat = actionStatFixed;
+            break;
+          // Прием подачи
+          case 4:
+            playerStat.catch_stat = actionStatFixed;
+            break;
+          // Защита
+          case 5:
+            playerStat.defence_stat = actionStatFixed;
+            break;
+          // Передача на удар
+          case 6:
+            playerStat.support_stat = actionStatFixed;
+            break;
+        }
+      }
+      console.log(playerStat);
+      return playerStat;
+    });
+    console.log('stat before promise', stat);
+
+    let result = [];
+
+    await Promise.all(stat).then((results) => {
+      result = results.map((result) => result);
+      console.log('objectsArray', result);
     });
 
-    return players;
+    console.log('stat after promise', stat);
+    return result;
   }
 
   // Редактирование тренировки
@@ -340,9 +420,22 @@ class TrainService {
 
   // Добавление действия
   async addAction(id_train, name_action, result, condition, score, id_action_type, date, day_team) {
+    const train = await db.query(`SELECT account_id FROM trainings WHERE id_train = $1`, [
+      id_train,
+    ]);
     const action = await db.query(
-      `INSERT INTO actions(name_action, result, condition, score, id_train, id_action_type, date, day_team) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [name_action, result, condition, score, id_train, id_action_type, date, day_team],
+      `INSERT INTO actions(name_action, result, condition, score, id_train, id_action_type, date, day_team, account_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [
+        name_action,
+        result,
+        condition,
+        score,
+        id_train,
+        id_action_type,
+        date,
+        day_team,
+        train.rows[0].account_id,
+      ],
     );
     console.log(action.rows);
     console.log('id_train', id_train);
