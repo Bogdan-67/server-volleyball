@@ -72,5 +72,7 @@ CREATE TABLE actions(
     id_train INTEGER,
     FOREIGN KEY (id_train) REFERENCES trainings(id_train) ON DELETE CASCADE,
     id_action_type INTEGER,
-    FOREIGN KEY (id_action_type) REFERENCES action_types(id_action_type) ON DELETE CASCADE
+    FOREIGN KEY (id_action_type) REFERENCES action_types(id_action_type) ON DELETE CASCADE,
+    account_id INTEGER,
+    FOREIGN KEY (account_id) REFERENCES accounts(id_account) ON DELETE CASCADE
     );
