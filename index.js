@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 require('dotenv').config();
+const path = require('path');
 
 const userRouter = require('./routes/user.routes');
 const authRouter = require('./routes/auth.routes');
@@ -13,6 +15,8 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(path.resolve(__dirname, 'static')));
+app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(
   cors({

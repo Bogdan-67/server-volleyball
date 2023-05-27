@@ -63,6 +63,25 @@ class UserService {
       'UPDATE users SET name = $1, surname = $2, patronimyc = $3, phone = $4, email = $5 WHERE id_user = $6 RETURNING *',
       [name, surname, patronimyc, phone, email, id],
     );
+    const account = await db.query(
+      'SELECT login, role_name FROM accounts LEFT JOIN roles ON accounts.role_id = roles.id_role WHERE id_user = $1',
+      [user.rows[0].id_user],
+    );
+    const userData = new UserDTO({ ...user.rows[0], ...account.rows[0] });
+    return userData;
+  }
+
+  async getUserPhoto(id) {
+    const img = await db.query('SELECT img FROM users WHERE id_user = $1', [id]);
+    return img;
+  }
+
+  async updateUserPhoto(id, img) {
+    const oldImg = await db.query(`SELECT img FROM users WHERE id_user = $1`, [id]);
+    const user = await db.query('UPDATE users SET img = $1 WHERE id_user = $2 RETURNING *', [
+      img,
+      id,
+    ]);
     return user;
   }
 

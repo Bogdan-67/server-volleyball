@@ -1,6 +1,8 @@
 const UserService = require('../service/user-service.js');
 const { validationResult } = require('express-validator');
 const ApiError = require('../exceptions/api-error');
+const uuid = require('uuid');
+const path = require('path');
 
 class UserController {
   async createUser(req, res, next) {
@@ -41,7 +43,33 @@ class UserController {
   async updateUser(req, res, next) {
     try {
       const updatedUser = await UserService.updateUser(req.body, req.params.id);
-      res.status(200).json(updatedUser.rows[0]);
+      console.log(updatedUser);
+      res.status(200).json(updatedUser);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getUserPhoto(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const userPhoto = await UserService.getUserPhoto(id);
+      res.status(200).json(userPhoto.rows[0]);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async updateUserPhoto(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { img } = req.files;
+      let fileName = uuid.v4() + '.jpg';
+      img.mv(path.resolve(__dirname, '..', 'static', fileName));
+
+      const userPhoto = await UserService.updateUserPhoto(id, fileName);
+      res.status(200).json(userPhoto.rows[0]);
     } catch (e) {
       next(e);
     }

@@ -5,7 +5,8 @@ CREATE TABLE users(
     patronimyc VARCHAR(255),
     phone VARCHAR(20),
     email VARCHAR(100),
-    team VARCHAR(100)
+    team VARCHAR(100),
+    img VARCHAR(255),
 );
 
 CREATE TABLE roles(

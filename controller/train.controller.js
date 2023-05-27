@@ -90,6 +90,16 @@ class TrainController {
       next(e);
     }
   }
+  async getUserStat(req, res, next) {
+    try {
+      const { id } = req.params;
+      const stat = await trainService.getUserStat(id);
+      console.log('stat before send', stat);
+      res.status(200).json(stat);
+    } catch (e) {
+      next(e);
+    }
+  }
   async editTrain(req, res, next) {
     try {
     } catch (e) {
