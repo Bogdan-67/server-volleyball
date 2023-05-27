@@ -51,9 +51,9 @@ class AuthService {
     }
     console.log(user.rows[0]);
     const userRole = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [
-      user.rows[0].role_id,
+      account.rows[0].role_id,
     ]);
-    console.log(userRole.rows[0]);
+    console.log('userRole.rows[0]', userRole.rows[0]);
 
     const userDto = new UserDTO({ ...account.rows[0], ...user.rows[0] });
     userDto.role = userData.role;
