@@ -130,8 +130,11 @@ class TrainController {
   }
   async getTrainActions(req, res, next) {
     try {
-      const { date, day_team } = req.query;
-      const trainActions = await trainService.getTrainActions(date, day_team);
+      let { date, day_team, limit, page } = req.query;
+      page = +page || 1;
+      limit = +limit || 8;
+      let offset = page * limit - limit;
+      const trainActions = await trainService.getTrainActions(date, day_team, limit, offset);
       res.status(200).json(trainActions);
     } catch (e) {
       next(e);

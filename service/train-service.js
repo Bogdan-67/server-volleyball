@@ -456,17 +456,20 @@ class TrainService {
     );
   }
 
-  // Получение действий пользователя
-  async getTrainActions(date, day_team) {
+  // Получение действий за тренировку
+  async getTrainActions(date, day_team, limit, offset) {
     const data = await db.query(
-      `SELECT * FROM actions LEFT JOIN trainings ON trainings.id_train = actions.id_train LEFT JOIN accounts ON accounts.id_account = trainings.account_id LEFT JOIN users ON accounts.id_user = users.id_user WHERE actions.date = $1 AND actions.day_team = $2`,
+      `SELECT * FROM actions LEFT JOIN trainings ON trainings.id_train = actions.id_train LEFT JOIN accounts ON accounts.id_account = trainings.account_id LEFT JOIN users ON accounts.id_user = users.id_user WHERE actions.date = $1 AND actions.day_team = $2 ORDER BY (actions.date + actions.time) DESC`,
       [date, day_team],
     );
 
     const actions = data.rows.map((action) => {
       return new ActionDTO({ ...action });
     });
-    return actions;
+
+    const count = Math.ceil(actions.length / limit);
+    const actionsPage = actions.slice(offset, offset + limit);
+    return { count: count, actions: [...actionsPage] };
   }
 
   // Получение действий пользователя
