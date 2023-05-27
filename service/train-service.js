@@ -13,13 +13,6 @@ class TrainService {
     if (!day_team) {
       throw ApiError.BadRequest('Не введено название команды!');
     }
-    // var utc = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
-    // console.log('utc', utc);
-    // const checkTrain = await db.query(`SELECT * FROM trainings WHERE date = $1`, [utc]);
-    // console.log(checkTrain.rows[0]);
-    // if (checkTrain.rows[0]) {
-    //   throw ApiError.BadRequest('Тренировка на данный день уже существует!');
-    // }
     const newTrain = await db.query(
       `INSERT INTO trainings(account_id, day_team) VALUES ($1, $2) RETURNING *`,
       [account_id, day_team],
@@ -299,6 +292,62 @@ class TrainService {
     return result;
   }
 
+  // Получение статистики пользователя
+  async getUserStat(id) {
+    let playerStat = {
+      inning_stat: 0,
+      attacks_stat: 0,
+      blocks_stat: 0,
+      catch_stat: 0,
+      defence_stat: 0,
+      support_stat: 0,
+    };
+    for (let i = 1; i <= 6; i++) {
+      const actions = await db.query(
+        `SELECT * FROM actions WHERE id_action_type = $1 AND account_id = $2`,
+        [i, id],
+      );
+      console.log('actions', actions.rows);
+      const winCount = actions.rows.filter((obj) => obj.score === 1).length;
+      const lossCount = actions.rows.filter((obj) => obj.score === -1).length;
+      const count = actions.rows.length;
+
+      const actionStat = (winCount - lossCount) / count > 0 ? (winCount - lossCount) / count : 0;
+      console.log('actionStat', actionStat);
+      const actionStatFixed = +actionStat.toFixed(2);
+      console.log('actionStatFixed', actionStatFixed);
+
+      switch (i) {
+        // Подача
+        case 1:
+          playerStat.inning_stat = actionStatFixed;
+          break;
+        // Атака
+        case 2:
+          playerStat.attacks_stat = actionStatFixed;
+          break;
+        // Блокирование
+        case 3:
+          playerStat.blocks_stat = actionStatFixed;
+          break;
+        // Прием подачи
+        case 4:
+          playerStat.catch_stat = actionStatFixed;
+          break;
+        // Защита
+        case 5:
+          playerStat.defence_stat = actionStatFixed;
+          break;
+        // Передача на удар
+        case 6:
+          playerStat.support_stat = actionStatFixed;
+          break;
+      }
+    }
+    console.log(playerStat);
+    return playerStat;
+  }
+
   // Редактирование тренировки
   async editTrain() {}
 
@@ -467,7 +516,7 @@ class TrainService {
       return new ActionDTO({ ...action });
     });
 
-    const count = Math.ceil(actions.length / limit);
+    const count = actions.length;
     const actionsPage = actions.slice(offset, offset + limit);
     return { count: count, actions: [...actionsPage] };
   }

@@ -8,6 +8,7 @@ router.post('/team-train', authMiddleware, trainController.addTeamTrain);
 router.get('/team-train', authMiddleware, trainController.getTeamTrain);
 router.get('/team-dates', authMiddleware, trainController.getTeamDates);
 router.get('/team-stat', authMiddleware, trainController.getTeamRangeStat);
+router.get('/stat/:id', authMiddleware, trainController.getUserStat);
 router.get('/teams', authMiddleware, trainController.getTeams);
 router.get('/team/:team', authMiddleware, trainController.checkTeam);
 router.get('/trains/:account_id', authMiddleware, trainController.getTrains);
