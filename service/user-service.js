@@ -1,5 +1,7 @@
 const db = require('../db');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const path = require('path');
 const tokenService = require('../service/token-service');
 const UserDTO = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
@@ -73,16 +75,38 @@ class UserService {
 
   async getUserPhoto(id) {
     const img = await db.query('SELECT img FROM users WHERE id_user = $1', [id]);
-    return img;
+    return img.rows[0].img;
   }
 
   async updateUserPhoto(id, img) {
     const oldImg = await db.query(`SELECT img FROM users WHERE id_user = $1`, [id]);
+    if (oldImg.rows[0].img !== 'avatar.jpg') {
+      fs.unlink(path.resolve(__dirname, '..', 'static', oldImg.rows[0].img), (err) => {
+        if (err) console.log(err);
+        console.log('File was deleted');
+      });
+    }
     const user = await db.query('UPDATE users SET img = $1 WHERE id_user = $2 RETURNING *', [
       img,
       id,
     ]);
-    return user;
+    return user.rows[0].img;
+  }
+
+  async deleteUserPhoto(id) {
+    const userPhoto = await db.query(`SELECT img FROM users WHERE id_user = $1`, [id]);
+    const photo = userPhoto.rows[0].img;
+    fs.unlink(path.resolve(__dirname, '..', 'static', photo), (err) => {
+      if (err) console.log(err);
+      console.log('File was deleted');
+    });
+
+    const userDeletedPhoto = await db.query(
+      `UPDATE users SET img = 'avatar.jpg'
+    WHERE id_user = $1 RETURNING *`,
+      [id],
+    );
+    return userDeletedPhoto.rows[0].img;
   }
 
   async deleteUser(id) {

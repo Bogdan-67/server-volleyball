@@ -294,6 +294,9 @@ class TrainService {
 
   // Получение статистики пользователя
   async getUserStat(id) {
+    if (!id) {
+      throw ApiError.BadRequest('ID пользователя null');
+    }
     let playerStat = {
       inning_stat: 0,
       attacks_stat: 0,

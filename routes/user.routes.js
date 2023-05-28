@@ -12,8 +12,9 @@ router.post(
 router.get('/users', userController.getUsers);
 router.get('/user/:id', userController.getOneUser);
 router.put('/user/:id', userController.updateUser);
-router.get('/user/photo/:id', userController.getUserPhoto);
-router.put('/user/photo/:id', userController.updateUserPhoto);
+router.get('/photo/:id', userController.getUserPhoto);
+router.put('/photo', userController.updateUserPhoto);
+router.delete('/photo/:id', userController.deleteUserPhoto);
 router.delete('/user/:id', userController.deleteUser);
 
 module.exports = router;

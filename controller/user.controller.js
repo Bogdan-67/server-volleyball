@@ -63,13 +63,24 @@ class UserController {
 
   async updateUserPhoto(req, res, next) {
     try {
-      const { id } = req.params;
+      const { id } = req.body;
       const { img } = req.files;
       let fileName = uuid.v4() + '.jpg';
+      console.log('fileName', fileName);
       img.mv(path.resolve(__dirname, '..', 'static', fileName));
+      console.log('file moved');
 
       const userPhoto = await UserService.updateUserPhoto(id, fileName);
-      res.status(200).json(userPhoto.rows[0]);
+      res.status(200).json(userPhoto);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async deleteUserPhoto(req, res, next) {
+    try {
+      const deletedUserPhoto = await UserService.deleteUserPhoto(req.params.id);
+      res.status(200).json(deletedUserPhoto);
     } catch (e) {
       next(e);
     }
