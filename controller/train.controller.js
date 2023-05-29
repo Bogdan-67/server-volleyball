@@ -71,7 +71,10 @@ class TrainController {
   async getTrains(req, res, next) {
     try {
       const account_id = req.params.account_id;
-      const { date_start, date_end } = req.query;
+      let { date_start, date_end, limit, page } = req.query;
+      page = +page || 1;
+      limit = +limit || 8;
+      let offset = page * limit - limit;
       console.log('date_start:', date_start, 'date_end:', date_end);
       const trains = await trainService.getTrains(account_id, date_start, date_end);
       res.status(200).json(trains.rows);
