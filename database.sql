@@ -77,3 +77,24 @@ CREATE TABLE actions(
     account_id INTEGER,
     FOREIGN KEY (account_id) REFERENCES accounts(id_account) ON DELETE CASCADE
     );
+    
+INSERT INTO public.action_types (
+  id_action_type, name_type, result, win_condition, loss_condition, description)
+  VALUES (
+    '1'::integer, 'Подача'::character varying, 'Выигрышная подача; Ошибка подачи; Нулевая подача;'::character varying, 
+    'Мяч касается площадки соперника; Принимающая команда совершает нарушение; Ошибка в расстановке принимающей команды'::character varying, 
+    'Мяч не перелетает через сетку; Мяч падает за пределами площадки (или задевает антенну); Заступ падающего; Ошибка в расстановке подающей команды'::character varying, 
+    'Подача – это действие введения мяча в игру правым игроком задней линии, находящимся в зоне подачи.'::text)
+returning id_action_type;
+
+INSERT INTO public.action_types (
+  id_action_type, name_type, result, win_condition, loss_condition, description)
+  VALUES ( 
+    '2'::integer,
+    'Атака'::character varying,
+    'Выигрыш; Ошибка атаки; Мяч остается в игре (нулевая атака)'::character varying, 
+    'Атака привела к очку'::character varying, 
+    'Мяч за пределами площадки; Мяч попадает в сетку; Мяч блокируется соперником, в результате чего соперник зарабатывает очко; Четыре касания; Переход средней линии;
+    двойное касание; Ошибка либеро; Касание антенны; Ошибка игрока задней линии'::character varying, 
+    'Атакой считают все действия, в результате которых мяч направляется на сторону соперника, исключая подачу и блок.'::text)
+returning id_action_type;
