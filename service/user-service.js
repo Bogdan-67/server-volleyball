@@ -53,7 +53,7 @@ class UserService {
       'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user',
     );
     const usersArr = users.rows.map((item) => {
-      const user = new SelectUsersDTO(item);
+      const user = new UserDTO(item);
       return { ...user };
     });
     console.log('Users', usersArr);
