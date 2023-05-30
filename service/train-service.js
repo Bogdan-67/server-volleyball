@@ -168,7 +168,7 @@ class TrainService {
       console.log('date_start:', date_start);
     }
     const trains = await db.query(
-      `SELECT * FROM trainings WHERE account_id = $1 AND date BETWEEN $2 AND $3`,
+      `SELECT * FROM trainings WHERE account_id = $1 AND date BETWEEN $2 AND $3 ORDER BY date DESC`,
       [account_id, date_start, date_end],
     );
     return trains;
