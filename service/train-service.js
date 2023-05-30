@@ -150,7 +150,7 @@ class TrainService {
   }
 
   // Получение тренировок пользователя за заданный период
-  async getTrains(account_id, date_start, date_end) {
+  async getTrains(account_id, date_start, date_end, offset, limit) {
     if (!account_id) {
       throw ApiError.UnauthorisedError();
     }
@@ -171,7 +171,13 @@ class TrainService {
       `SELECT * FROM trainings WHERE account_id = $1 AND date BETWEEN $2 AND $3 ORDER BY date DESC`,
       [account_id, date_start, date_end],
     );
-    return trains;
+
+    console.log('trains', trains.rows);
+
+    const count = trains.rows.length;
+    const trainsPage = trains.rows.slice(offset, offset + limit);
+
+    return { count: count, rows: [...trainsPage] };
   }
 
   // Получение данных команды за период времени
@@ -245,9 +251,6 @@ class TrainService {
         console.log('actionStat', actionStat);
         const actionStatFixed = +actionStat.toFixed(2);
         console.log('actionStatFixed', actionStatFixed);
-
-        // const nameAction = actionsTypes.filter((obj) => obj.id_action_type === i)[0].name_type;
-        // playerStat[nameAction] = actionStatFixed;
 
         switch (i) {
           // Подача

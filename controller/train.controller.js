@@ -76,8 +76,8 @@ class TrainController {
       limit = +limit || 8;
       let offset = page * limit - limit;
       console.log('date_start:', date_start, 'date_end:', date_end);
-      const trains = await trainService.getTrains(account_id, date_start, date_end);
-      res.status(200).json(trains.rows);
+      const trains = await trainService.getTrains(account_id, date_start, date_end, offset, limit);
+      res.status(200).json(trains);
     } catch (e) {
       next(e);
     }
