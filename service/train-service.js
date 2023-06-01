@@ -354,11 +354,31 @@ class TrainService {
     return playerStat;
   }
 
-  // Редактирование тренировки
-  async editTrain() {}
+  // Удаление тренировки пользователя
+  async deletePlayerTrain(account_id, id_train) {
+    if (!account_id) {
+      throw ApiError.UnauthorisedError();
+    }
+    console.log('id_train', id_train);
+    const deletedTrain = await db.query(`DELETE FROM trainings WHERE id_train = $1 RETURNING *`, [
+      id_train,
+    ]);
+    console.log('deletedTrain', deletedTrain.rows[0]);
+    return deletedTrain.rows[0];
+  }
 
   // Удаление тренировки
-  async deleteTrain() {}
+  async deleteTrain(account_id, date, day_team) {
+    if (!account_id) {
+      throw ApiError.UnauthorisedError();
+    }
+    const deletedTrain = await db.query(
+      `DELETE FROM trainings WHERE date = $1 AND day_team = $2 RETURNING *`,
+      [date, day_team],
+    );
+    console.log('deletedTrain', deletedTrain.rows);
+    return deletedTrain.rows;
+  }
 
   // Перерасчет столбца статистики
   async calculateTrain(id_action_type, id_train, name_action) {

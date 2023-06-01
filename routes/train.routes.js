@@ -14,8 +14,8 @@ router.get('/teams', authMiddleware, trainController.getTeams);
 router.get('/team/:team', authMiddleware, trainController.checkTeam);
 router.get('/trains/:account_id', authMiddleware, trainController.getTrains);
 router.get('/train/:account_id', authMiddleware, trainController.getOneTrain);
-router.put('/train', checkRole('EDITOR'), trainController.editTrain);
-router.delete('/train', checkRole('ADMIN'), trainController.deleteTrain);
+router.delete('/team-train/:account_id', checkRole('ADMIN'), trainController.deleteTrain);
+router.delete('/train/:account_id', checkRole('ADMIN'), trainController.deletePlayerTrain);
 
 router.post('/action', checkRole('EDITOR'), trainController.addAction);
 router.get('/actions', authMiddleware, trainController.getActions);

@@ -103,14 +103,22 @@ class TrainController {
       next(e);
     }
   }
-  async editTrain(req, res, next) {
+  async deletePlayerTrain(req, res, next) {
     try {
+      const { account_id } = req.params;
+      const { id_train } = req.query;
+      const deletedTrain = await trainService.deletePlayerTrain(account_id, id_train);
+      res.status(200).json(deletedTrain);
     } catch (e) {
       next(e);
     }
   }
   async deleteTrain(req, res, next) {
     try {
+      const { account_id } = req.params;
+      const { date, day_team } = req.query;
+      const deletedTrain = await trainService.deleteTrain(account_id, date, day_team);
+      res.status(200).json(deletedTrain);
     } catch (e) {
       next(e);
     }
