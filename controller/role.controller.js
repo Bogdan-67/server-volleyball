@@ -23,8 +23,8 @@ class RoleController {
 
   async removeRole(req, res, next) {
     try {
-      const { role, users } = req.body;
-      const updRoles = await RoleService.giveRole(role, users);
+      const { users } = req.body;
+      const updRoles = await RoleService.removeRole(users);
       res.status(200).json(updRoles);
     } catch (e) {
       next(e);
