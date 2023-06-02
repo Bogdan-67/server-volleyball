@@ -8,6 +8,7 @@ const path = require('path');
 const userRouter = require('./routes/user.routes');
 const authRouter = require('./routes/auth.routes');
 const trainRouter = require('./routes/train.routes');
+const roleRouter = require('./routes/role.routes');
 const errorMiddleware = require('./middlewares/error-middleware');
 
 const PORT = process.env.PORT || 8000;
@@ -28,6 +29,7 @@ app.use(
 app.use('/api', userRouter);
 app.use('/api', authRouter);
 app.use('/api', trainRouter);
+app.use('/api', roleRouter);
 app.use(errorMiddleware);
 
 const start = async () => {
