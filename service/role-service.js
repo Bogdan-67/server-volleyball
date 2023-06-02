@@ -24,7 +24,6 @@ class RoleService {
         `UPDATE accounts SET role_id=$1 WHERE id_account=$2 RETURNING *`,
         [roleId.rows[0].id_role, user],
       );
-      console.log(updRole.rows[0]);
     });
 
     await Promise.all(promises);
@@ -32,16 +31,27 @@ class RoleService {
     return 0;
   }
 
-  async removeRole(role, users) {
-    if (!role) {
-      throw ApiError.BadRequest('Не введена роль!');
-    }
+  async removeRole(users) {
+    console.log('in remove role');
+    console.log('check', !Array.isArray(users));
     if (!Array.isArray(users)) {
       throw ApiError.BadRequest('users не является массивом!');
     }
     if (users.length === 0) {
       throw ApiError.BadRequest('Не введено ни одного игрока!');
     }
+
+    const promises = users.map(async (user) => {
+      const roleId = await db.query(`SELECT id_role FROM roles WHERE role_name=$1`, ['USER']);
+      const updRole = await db.query(
+        `UPDATE accounts SET role_id=$1 WHERE id_account=$2 RETURNING *`,
+        [roleId.rows[0].id_role, user],
+      );
+    });
+
+    await Promise.all(promises);
+
+    return 0;
   }
 }
 
