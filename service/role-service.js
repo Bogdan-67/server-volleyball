@@ -31,7 +31,10 @@ class RoleService {
     return 0;
   }
 
-  async removeRole(users) {
+  async removeRole(role, users) {
+    if (!role) {
+      throw ApiError.BadRequest('Не введена роль!');
+    }
     if (!Array.isArray(users)) {
       throw ApiError.BadRequest('users не является массивом!');
     }
