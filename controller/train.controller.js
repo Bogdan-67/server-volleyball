@@ -4,9 +4,9 @@ const ApiError = require('../exceptions/api-error');
 class TrainController {
   async addTrain(req, res, next) {
     try {
-      const { account_id, day_team } = req.body;
-      const newTrain = await trainService.addTrain(account_id, day_team);
-      res.status(200).json(newTrain.rows[0]);
+      const { account_id, date, day_team } = req.body;
+      const newTrain = await trainService.addTrain(account_id, date, day_team);
+      res.status(200).json(newTrain);
     } catch (e) {
       next(e);
     }

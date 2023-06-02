@@ -6,18 +6,25 @@ const ApiError = require('../exceptions/api-error');
 
 class TrainService {
   // Добавление тренировки пользователю
-  async addTrain(account_id, day_team) {
+  async addTrain(account_id, date, day_team) {
     if (!account_id) {
       throw ApiError.UnauthorisedError();
     }
     if (!day_team) {
       throw ApiError.BadRequest('Не введено название команды!');
     }
+    if (!date) {
+      throw ApiError.BadRequest('Не введена дата!');
+    }
     const newTrain = await db.query(
-      `INSERT INTO trainings(account_id, day_team) VALUES ($1, $2) RETURNING *`,
-      [account_id, day_team],
+      `INSERT INTO trainings(account_id, day_team, date) VALUES ($1, $2, $3) RETURNING *`,
+      [account_id, day_team, date],
     );
-    return newTrain;
+    const user = await db.query(
+      `SELECT * FROM accounts LEFT JOIN users ON accounts.id_user=users.id_user WHERE id_account=$1`,
+      [account_id],
+    );
+    return new TrainDTO({ ...newTrain.rows[0], ...user.rows[0] });
   }
   // Добавление тренировок пользователям введенной команды
   async addTeamTrain(account_id, day_team, players) {
