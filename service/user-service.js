@@ -60,6 +60,18 @@ class UserService {
     return usersArr;
   }
 
+  async getSelectUsers(req, res) {
+    const users = await db.query(
+      'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user',
+    );
+    const usersArr = users.rows.map((item) => {
+      const user = new SelectUsersDTO(item);
+      return { ...user };
+    });
+    console.log('Users', usersArr);
+    return usersArr;
+  }
+
   async updateUser({ name, surname, patronimyc, phone, email }, id) {
     const user = await db.query(
       'UPDATE users SET name = $1, surname = $2, patronimyc = $3, phone = $4, email = $5 WHERE id_user = $6 RETURNING *',

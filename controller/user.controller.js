@@ -40,6 +40,15 @@ class UserController {
     }
   }
 
+  async getSelectUsers(req, res, next) {
+    try {
+      const getUsers = await UserService.getSelectUsers();
+      res.status(200).json(getUsers);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async updateUser(req, res, next) {
     try {
       const updatedUser = await UserService.updateUser(req.body, req.params.id);
