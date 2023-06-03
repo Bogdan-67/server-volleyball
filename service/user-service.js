@@ -50,7 +50,7 @@ class UserService {
 
   async getUsers(req, res) {
     const users = await db.query(
-      'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user',
+      'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role',
     );
     const usersArr = users.rows.map((item) => {
       const user = new UserDTO(item);
