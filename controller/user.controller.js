@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const ApiError = require('../exceptions/api-error');
 const uuid = require('uuid');
 const path = require('path');
+const sharp = require('sharp');
 
 class UserController {
   async createUser(req, res, next) {
@@ -74,11 +75,31 @@ class UserController {
     try {
       const { id } = req.body;
       const { img } = req.files;
+      const maxSize = 10 * 1024 * 1024; // Максимальный размер файла в байтах (10 МБ)
       let fileName = uuid.v4() + '.jpg';
-      console.log('fileName', fileName);
-      img.mv(path.resolve(__dirname, '..', 'static', fileName));
-      console.log('file moved');
+      const filePath = path.resolve(__dirname, '..', 'static', fileName);
 
+      if (img.size > maxSize) {
+        // Изображение превышает максимальный размер, необходимо сжатие
+        sharp(img.data)
+          .resize({ width: 800, height: 600 }) // Установите необходимые размеры
+          .toFile(filePath, (err, info) => {
+            if (err) {
+              console.error('Ошибка при сжатии изображения:', err);
+              return res.status(500).json({ message: 'Ошибка при сжатии изображения.' });
+            }
+            console.log('Изображение успешно сжато:', info);
+          });
+      } else {
+        // Изображение не превышает максимальный размер, сохраняем его без изменений
+        img.mv(filePath, (err) => {
+          if (err) {
+            console.error('Ошибка при сохранении изображения:', err);
+            return res.status(500).json({ message: 'Ошибка при сохранении изображения.' });
+          }
+          console.log('Изображение успешно сохранено');
+        });
+      }
       const userPhoto = await UserService.updateUserPhoto(id, fileName);
       res.status(200).json(userPhoto);
     } catch (e) {
