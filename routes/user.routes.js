@@ -6,10 +6,7 @@ const checkRole = require('../middlewares/check-role-middleware');
 const Recaptcha = require('express-recaptcha').RecaptchaV2;
 
 // Создайте экземпляр Recaptcha, передавая секретный и публичный ключи
-const recaptcha = new Recaptcha(
-  '6LdgYm4mAAAAACTOp4w9EpdEFelIVMomXK4EA5L_',
-  '6LdgYm4mAAAAAA81tXM4zKJoV2_o8qn1Zje3_R9t',
-);
+const recaptcha = new Recaptcha(process.env.RECAPTCHA_SITE_KEY, process.env.RECAPTCHA_SECRET_KEY);
 
 router.post(
   '/registration',
