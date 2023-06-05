@@ -3,11 +3,21 @@ const router = new Router();
 const userController = require('../controller/user.controller');
 const { body } = require('express-validator');
 const checkRole = require('../middlewares/check-role-middleware');
+const Recaptcha = require('express-recaptcha').RecaptchaV2;
+
+// Создайте экземпляр Recaptcha, передавая секретный и публичный ключи
+const recaptcha = new Recaptcha(
+  '6LdgYm4mAAAAACTOp4w9EpdEFelIVMomXK4EA5L_',
+  '6LdgYm4mAAAAAA81tXM4zKJoV2_o8qn1Zje3_R9t',
+);
 
 router.post(
   '/registration',
-  body('email').isEmail(),
-  body('password').isLength({ min: 4, max: 32 }),
+  [
+    body('email').isEmail(),
+    body('password').isLength({ min: 4, max: 32 }),
+    recaptcha.middleware.verify, // Добавьте middleware проверки капчи
+  ],
   userController.createUser,
 );
 router.get('/users', checkRole('ADMIN'), userController.getUsers);

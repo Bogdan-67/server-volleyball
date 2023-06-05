@@ -12,6 +12,12 @@ class UserController {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
       }
+
+      // Проверка результата капчи
+      if (!req.body['g-recaptcha-response']) {
+        return next(ApiError.BadRequest('Необходимо пройти капчу'));
+      }
+
       const createdUser = await UserService.createUser(req.body);
       res.cookie('refreshToken', createdUser.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
