@@ -308,12 +308,12 @@ class TrainService {
       throw ApiError.BadRequest('ID пользователя null');
     }
     let playerStat = {
-      inning_stat: 0,
-      attacks_stat: 0,
-      blocks_stat: 0,
-      catch_stat: 0,
-      defence_stat: 0,
-      support_stat: 0,
+      inning: {},
+      attacks: {},
+      blocks: {},
+      catch: {},
+      defence: {},
+      support: {},
     };
     for (let i = 1; i <= 6; i++) {
       const actions = await db.query(
@@ -330,30 +330,36 @@ class TrainService {
       const actionStatFixed = +actionStat.toFixed(2);
       console.log('actionStatFixed', actionStatFixed);
 
+      const statHolder = (name) => {
+        playerStat[name][name + '_stat'] = actionStatFixed;
+        playerStat[name][name + '_winCount'] = winCount;
+        playerStat[name][name + '_lossCount'] = lossCount;
+      };
+
       switch (i) {
         // Подача
         case 1:
-          playerStat.inning_stat = actionStatFixed;
+          statHolder('inning');
           break;
         // Атака
         case 2:
-          playerStat.attacks_stat = actionStatFixed;
+          statHolder('attacks');
           break;
         // Блокирование
         case 3:
-          playerStat.blocks_stat = actionStatFixed;
+          statHolder('blocks');
           break;
         // Прием подачи
         case 4:
-          playerStat.catch_stat = actionStatFixed;
+          statHolder('catch');
           break;
         // Защита
         case 5:
-          playerStat.defence_stat = actionStatFixed;
+          statHolder('defence');
           break;
         // Передача на удар
         case 6:
-          playerStat.support_stat = actionStatFixed;
+          statHolder('support');
           break;
       }
     }
