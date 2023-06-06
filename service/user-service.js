@@ -125,8 +125,9 @@ class UserService {
   }
 
   async deleteUser(id) {
+    const delAccount = await db.query(`SELECT * FROM accounts WHERE id_user = $1`, [id]);
     const user = await db.query(`DELETE FROM users WHERE id_user = $1`, [id]);
-    return user;
+    return new UserDTO({ ...delAccount.rows[0], ...user.rows[0] });
   }
 }
 

@@ -129,7 +129,7 @@ class UserController {
   async deleteUser(req, res, next) {
     try {
       const deletedUser = await UserService.deleteUser(req.params.id);
-      res.status(200).json(deletedUser.rows[0]);
+      res.status(200).json(deletedUser);
     } catch (e) {
       next(e);
     }
