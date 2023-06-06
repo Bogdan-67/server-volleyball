@@ -48,7 +48,7 @@ class UserService {
     return user;
   }
 
-  async getUsers(req, res) {
+  async getUsers(offset, limit) {
     const users = await db.query(
       'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role',
     );
@@ -56,8 +56,11 @@ class UserService {
       const user = new UserDTO(item);
       return { ...user };
     });
+    const count = users.rows.length;
+    const usersPage = users.rows.slice(offset, offset + limit);
     console.log('Users', usersArr);
-    return usersArr;
+    console.log('limit', limit, 'offset', offset);
+    return { count: count, rows: [...usersPage] };
   }
 
   async getSelectUsers(req, res) {
