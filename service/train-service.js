@@ -303,22 +303,33 @@ class TrainService {
   }
 
   // Получение статистики пользователя
-  async getUserStat(id) {
+  async getUserStat(id, date_start, date_end) {
     if (!id) {
       throw ApiError.BadRequest('ID пользователя null');
     }
+    if (!date_end) {
+      let date = new Date().toLocaleString().slice(0, 10).replaceAll('.', '-');
+      let new_date = date.slice(6, 10) + '-' + date.slice(3, 5) + '-' + date.slice(0, 2);
+      date_end = new_date;
+      console.log('date_end:', date_end);
+    }
+    if (!date_start) {
+      const date = await db.query(`SELECT MIN(date) FROM actions WHERE account_id = $1`, [id]);
+      date_start = date.rows[0].min;
+      console.log('date_start:', date_start);
+    }
     let playerStat = {
-      inning_stat: 0,
-      attacks_stat: 0,
-      blocks_stat: 0,
-      catch_stat: 0,
-      defence_stat: 0,
-      support_stat: 0,
+      inning: {},
+      attacks: {},
+      blocks: {},
+      catch: {},
+      defence: {},
+      support: {},
     };
     for (let i = 1; i <= 6; i++) {
       const actions = await db.query(
-        `SELECT * FROM actions WHERE id_action_type = $1 AND account_id = $2`,
-        [i, id],
+        `SELECT * FROM actions WHERE id_action_type = $1 AND account_id = $2 AND date BETWEEN $3 AND $4`,
+        [i, id, date_start, date_end],
       );
       console.log('actions', actions.rows);
       const winCount = actions.rows.filter((obj) => obj.score === 1).length;
@@ -330,30 +341,36 @@ class TrainService {
       const actionStatFixed = +actionStat.toFixed(2);
       console.log('actionStatFixed', actionStatFixed);
 
+      const statHolder = (name) => {
+        playerStat[name][name + '_stat'] = actionStatFixed;
+        playerStat[name][name + '_winCount'] = winCount;
+        playerStat[name][name + '_lossCount'] = lossCount;
+      };
+
       switch (i) {
         // Подача
         case 1:
-          playerStat.inning_stat = actionStatFixed;
+          statHolder('inning');
           break;
         // Атака
         case 2:
-          playerStat.attacks_stat = actionStatFixed;
+          statHolder('attacks');
           break;
         // Блокирование
         case 3:
-          playerStat.blocks_stat = actionStatFixed;
+          statHolder('blocks');
           break;
         // Прием подачи
         case 4:
-          playerStat.catch_stat = actionStatFixed;
+          statHolder('catch');
           break;
         // Защита
         case 5:
-          playerStat.defence_stat = actionStatFixed;
+          statHolder('defence');
           break;
         // Передача на удар
         case 6:
-          playerStat.support_stat = actionStatFixed;
+          statHolder('support');
           break;
       }
     }

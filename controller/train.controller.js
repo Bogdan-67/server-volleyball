@@ -95,8 +95,8 @@ class TrainController {
   }
   async getUserStat(req, res, next) {
     try {
-      const { id } = req.params;
-      const stat = await trainService.getUserStat(id);
+      const { id, date_start, date_end } = req.params;
+      const stat = await trainService.getUserStat(id, date_start, date_end);
       console.log('stat before send', stat);
       res.status(200).json(stat);
     } catch (e) {
