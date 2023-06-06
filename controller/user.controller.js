@@ -45,6 +45,7 @@ class UserController {
       limit = +limit || 8;
       let offset = page * limit - limit;
       const getUsers = await UserService.getUsers(offset, limit);
+      console.log(getUsers);
       res.status(200).json(getUsers);
     } catch (e) {
       next(e);

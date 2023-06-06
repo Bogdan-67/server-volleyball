@@ -57,7 +57,7 @@ class UserService {
       return { ...user };
     });
     const count = users.rows.length;
-    const usersPage = users.rows.slice(offset, offset + limit);
+    const usersPage = usersArr.slice(offset, offset + limit);
     console.log('Users', usersArr);
     console.log('limit', limit, 'offset', offset);
     return { count: count, rows: [...usersPage] };
