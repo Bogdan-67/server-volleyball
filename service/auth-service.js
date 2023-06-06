@@ -49,14 +49,12 @@ class AuthService {
     if (!user.rows[0]) {
       throw ApiError.BadRequest('Пользователь не найден!');
     }
-    console.log(user.rows[0]);
     const userRole = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [
       account.rows[0].role_id,
     ]);
     console.log('userRole.rows[0]', userRole.rows[0]);
 
-    const userDto = new UserDTO({ ...account.rows[0], ...user.rows[0] });
-    userDto.role = userData.role;
+    const userDto = new UserDTO({ ...account.rows[0], ...user.rows[0], ...userRole.rows[0] });
     console.log('userDto', userDto);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
