@@ -75,10 +75,10 @@ class UserService {
     return usersArr;
   }
 
-  async updateUser({ name, surname, patronimyc, phone, email }, id) {
+  async updateUser({ name, surname, patronimyc, phone, email, team }, id) {
     const user = await db.query(
-      'UPDATE users SET name = $1, surname = $2, patronimyc = $3, phone = $4, email = $5 WHERE id_user = $6 RETURNING *',
-      [name, surname, patronimyc, phone, email, id],
+      'UPDATE users SET name = $1, surname = $2, patronimyc = $3, phone = $4, email = $5, team = $6 WHERE id_user = $7 RETURNING *',
+      [name, surname, patronimyc, phone, email, team, id],
     );
     const account = await db.query(
       'SELECT login, role_name FROM accounts LEFT JOIN roles ON accounts.role_id = roles.id_role WHERE id_user = $1',
