@@ -59,11 +59,9 @@ class TrainController {
   async getOneTrain(req, res, next) {
     try {
       const account_id = req.params.account_id;
-      const { date, day_team } = req.query;
-      console.log(date);
-      const train = await trainService.getOneTrain(account_id, date, day_team);
-      console.log(train);
-      res.status(200).json(train.rows[0]);
+      const { id_train } = req.query;
+      const train = await trainService.getOneTrain(account_id, id_train);
+      res.status(200).json(train);
     } catch (e) {
       next(e);
     }
@@ -75,7 +73,7 @@ class TrainController {
       page = +page || 1;
       limit = +limit || 8;
       let offset = page * limit - limit;
-      console.log('date_start:', date_start, 'date_end:', date_end);
+      console.log('getTrains date_start:', date_start, 'date_end:', date_end);
       const trains = await trainService.getTrains(account_id, date_start, date_end, offset, limit);
       res.status(200).json(trains);
     } catch (e) {
@@ -95,8 +93,17 @@ class TrainController {
   }
   async getUserStat(req, res, next) {
     try {
-      const { id, date_start, date_end } = req.params;
-      const stat = await trainService.getUserStat(id, date_start, date_end);
+      const { id } = req.params;
+      const { id_train, date_start, date_end } = req.query;
+      console.log(
+        'getUserStat date_start:',
+        date_start,
+        'date_end:',
+        date_end,
+        'id_train:',
+        id_train,
+      );
+      const stat = await trainService.getUserStat(id, id_train, date_start, date_end);
       console.log('stat before send', stat);
       res.status(200).json(stat);
     } catch (e) {

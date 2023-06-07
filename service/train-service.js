@@ -148,12 +148,12 @@ class TrainService {
   }
 
   // Получение тренировки пользователя по команде и дате
-  async getOneTrain(account_id, date, day_team) {
+  async getOneTrain(account_id, id_train) {
     const train = await db.query(
-      `SELECT * FROM trainings WHERE account_id = $1 AND date = $2 AND date = $2 AND day_team = $3`,
-      [account_id, date, day_team],
+      `SELECT * FROM trainings WHERE account_id = $1 AND id_train = $2`,
+      [account_id, id_train],
     );
-    return train;
+    return train.rows[0];
   }
 
   // Получение тренировок пользователя за заданный период
@@ -178,8 +178,6 @@ class TrainService {
       `SELECT * FROM trainings WHERE account_id = $1 AND date BETWEEN $2 AND $3 ORDER BY date DESC`,
       [account_id, date_start, date_end],
     );
-
-    console.log('trains', trains.rows);
 
     const count = trains.rows.length;
     const trainsPage = trains.rows.slice(offset, offset + limit);
@@ -286,7 +284,6 @@ class TrainService {
             break;
         }
       }
-      console.log(playerStat);
       return playerStat;
     });
     console.log('stat before promise', stat);
@@ -303,21 +300,20 @@ class TrainService {
   }
 
   // Получение статистики пользователя
-  async getUserStat(id, date_start, date_end) {
+  async getUserStat(id, id_train, date_start, date_end) {
     if (!id) {
       throw ApiError.BadRequest('ID пользователя null');
     }
-    if (!date_end) {
+    if (!date_end || date_end === 'undefined') {
       let date = new Date().toLocaleString().slice(0, 10).replaceAll('.', '-');
       let new_date = date.slice(6, 10) + '-' + date.slice(3, 5) + '-' + date.slice(0, 2);
       date_end = new_date;
-      console.log('date_end:', date_end);
     }
-    if (!date_start) {
+    if (!date_start || date_start === 'undefined') {
       const date = await db.query(`SELECT MIN(date) FROM actions WHERE account_id = $1`, [id]);
       date_start = date.rows[0].min;
-      console.log('date_start:', date_start);
     }
+    console.log('after if date_start');
     let playerStat = {
       inning: {},
       attacks: {},
@@ -327,19 +323,24 @@ class TrainService {
       support: {},
     };
     for (let i = 1; i <= 6; i++) {
-      const actions = await db.query(
-        `SELECT * FROM actions WHERE id_action_type = $1 AND account_id = $2 AND date BETWEEN $3 AND $4`,
-        [i, id, date_start, date_end],
-      );
-      console.log('actions', actions.rows);
+      let actions = {};
+      if (!id_train || id_train === 'undefined') {
+        actions = await db.query(
+          `SELECT * FROM actions WHERE id_action_type = $1 AND account_id = $2 AND date BETWEEN $3 AND $4`,
+          [i, id, date_start, date_end],
+        );
+      } else {
+        actions = await db.query(
+          `SELECT * FROM actions WHERE id_action_type = $1 AND account_id = $2 AND id_train = $3`,
+          [i, id, id_train],
+        );
+      }
       const winCount = actions.rows.filter((obj) => obj.score === 1).length;
       const lossCount = actions.rows.filter((obj) => obj.score === -1).length;
       const count = actions.rows.length;
 
       const actionStat = (winCount - lossCount) / count > 0 ? (winCount - lossCount) / count : 0;
-      console.log('actionStat', actionStat);
       const actionStatFixed = +actionStat.toFixed(2);
-      console.log('actionStatFixed', actionStatFixed);
 
       const statHolder = (name) => {
         playerStat[name][name + '_stat'] = actionStatFixed;
@@ -374,7 +375,6 @@ class TrainService {
           break;
       }
     }
-    console.log(playerStat);
     return playerStat;
   }
 
