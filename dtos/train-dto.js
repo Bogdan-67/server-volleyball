@@ -7,6 +7,7 @@ module.exports = class TrainDTO {
   defence_stat;
   support_stat;
   id_train;
+  id_account;
 
   constructor(model) {
     this.fio = model.surname + ' ' + model.name + ' ' + model.patronimyc;
@@ -17,5 +18,6 @@ module.exports = class TrainDTO {
     this.defence_stat = String(model.defence_stat);
     this.support_stat = String(model.support_stat);
     this.id_train = model.id_train;
+    this.id_account = model.account_id;
   }
 };
