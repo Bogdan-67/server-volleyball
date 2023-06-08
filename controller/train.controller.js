@@ -152,8 +152,11 @@ class TrainController {
   }
   async getUserTrainActions(req, res, next) {
     try {
-      const { id_train } = req.params;
-      const actions = await trainService.getUserTrainActions(id_train);
+      let { id_train, limit, page } = req.query;
+      page = +page || 1;
+      limit = +limit || 8;
+      let offset = page * limit - limit;
+      const actions = await trainService.getUserTrainActions(id_train, limit, offset);
       res.status(200).json(actions);
     } catch (e) {
       next(e);

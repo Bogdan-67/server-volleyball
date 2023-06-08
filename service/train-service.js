@@ -578,14 +578,21 @@ class TrainService {
   }
 
   // Получение действий пользователя
-  async getUserTrainActions(id_train) {
+  async getUserTrainActions(id_train, limit, offset) {
     if (!id_train) {
       throw ApiError.BadRequest('Не введен id тренировки');
     }
-    const actions = await db.query(`SELECT * FROM actions WHERE id_train = $1 SORT BY time DESC`, [
+    const actions = await db.query(`SELECT * FROM actions WHERE id_train = $1 ORDER BY time DESC`, [
       id_train,
     ]);
-    return actions.rows;
+
+    const actionsDto = actions.rows.map((action) => {
+      return new ActionDTO({ ...action });
+    });
+
+    const count = actions.length;
+    const actionsPage = actionsDto.slice(offset, offset + limit);
+    return { count: count, actions: [...actionsPage] };
   }
 
   // Редактирование действия
