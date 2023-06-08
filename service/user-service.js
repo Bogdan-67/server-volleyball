@@ -81,7 +81,7 @@ class UserService {
       [name, surname, patronimyc, phone, email, team, id],
     );
     const account = await db.query(
-      'SELECT login, role_name FROM accounts LEFT JOIN roles ON accounts.role_id = roles.id_role WHERE id_user = $1',
+      'SELECT * FROM accounts LEFT JOIN roles ON accounts.role_id = roles.id_role WHERE id_user = $1',
       [user.rows[0].id_user],
     );
     const userData = new UserDTO({ ...user.rows[0], ...account.rows[0] });
