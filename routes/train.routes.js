@@ -18,7 +18,7 @@ router.delete('/team-train/:account_id', checkRole('ADMIN'), trainController.del
 router.delete('/train/:account_id', checkRole('ADMIN'), trainController.deletePlayerTrain);
 
 router.post('/action', checkRole('EDITOR'), trainController.addAction);
-router.get('/actions', authMiddleware, trainController.getActions);
+router.get('/actions', authMiddleware, trainController.getUserTrainActions);
 router.get('/train-actions', authMiddleware, trainController.getTrainActions);
 router.post('/action-types', checkRole('ADMIN'), trainController.addActionType);
 router.get('/action-types', authMiddleware, trainController.getActionsTypes);

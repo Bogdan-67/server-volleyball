@@ -557,6 +557,12 @@ class TrainService {
 
   // Получение действий за тренировку
   async getTrainActions(date, day_team, limit, offset) {
+    if (!date) {
+      throw ApiError.BadRequest('Не введена дата');
+    }
+    if (!day_team) {
+      throw ApiError.BadRequest('Не введена команда');
+    }
     const data = await db.query(
       `SELECT * FROM actions LEFT JOIN trainings ON trainings.id_train = actions.id_train LEFT JOIN accounts ON accounts.id_account = trainings.account_id LEFT JOIN users ON accounts.id_user = users.id_user WHERE actions.date = $1 AND actions.day_team = $2 ORDER BY (actions.date + actions.time) DESC`,
       [date, day_team],
@@ -572,7 +578,15 @@ class TrainService {
   }
 
   // Получение действий пользователя
-  async getActions() {}
+  async getUserTrainActions(id_train) {
+    if (!id_train) {
+      throw ApiError.BadRequest('Не введен id тренировки');
+    }
+    const actions = await db.query(`SELECT * FROM actions WHERE id_train = $1 SORT BY time DESC`, [
+      id_train,
+    ]);
+    return actions.rows;
+  }
 
   // Редактирование действия
   async editAction() {}

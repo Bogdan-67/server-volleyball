@@ -150,8 +150,11 @@ class TrainController {
       next(e);
     }
   }
-  async getActions(req, res, next) {
+  async getUserTrainActions(req, res, next) {
     try {
+      const { id_train } = req.params;
+      const actions = await trainService.getUserTrainActions(id_train);
+      res.status(200).json(actions);
     } catch (e) {
       next(e);
     }
