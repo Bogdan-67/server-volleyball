@@ -53,11 +53,11 @@ class UserController {
   }
   async searchUsers(req, res, next) {
     try {
-      let { search, page, limit } = req.query;
+      let { search, group, page, limit } = req.query;
       page = +page || 1;
       limit = +limit || 8;
       let offset = page * limit - limit;
-      const searchUsers = await UserService.searchUsers(search, offset, limit);
+      const searchUsers = await UserService.searchUsers(search, group, offset, limit);
       console.log(searchUsers);
       res.status(200).json(searchUsers);
     } catch (e) {
