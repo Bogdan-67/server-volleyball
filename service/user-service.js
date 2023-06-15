@@ -68,9 +68,9 @@ class UserService {
     if (search !== '') {
       console.log('Выполнилась Первая часть', search);
       const searchTerms = search.split(' '); // Разделяем строку по пробелам
-      const searchQuery = searchTerms.map((term) => `%${term}%`); // Формируем массив с шаблонами поиска
+      const searchQuery = searchTerms.map((term) => `%${term.toLowerCase()}%`); // Преобразуем каждый термин поиска в lowercase
       users = await db.query(
-        'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role WHERE name LIKE ANY ($1) OR surname LIKE ANY ($1) OR patronimyc LIKE ANY ($1)',
+        'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role WHERE LOWER(name) LIKE ANY ($1) OR LOWER(surname) LIKE ANY ($1) OR LOWER(patronimyc) LIKE ANY ($1)',
         [searchQuery],
       );
     } else {
