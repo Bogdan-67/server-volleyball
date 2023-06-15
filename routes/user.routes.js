@@ -22,6 +22,7 @@ router.get('/user/:id', userController.getOneUser);
 router.put('/user/:id', userController.updateUser);
 router.get('/select-users', checkRole('EDITOR'), userController.getSelectUsers);
 router.get('/photo/:id', userController.getUserPhoto);
+router.get('/search-users', checkRole('EDITOR'), userController.searchUsers);
 router.put('/photo', userController.updateUserPhoto);
 router.delete('/photo/:id', userController.deleteUserPhoto);
 router.delete('/user/:id', checkRole('ADMIN'), userController.deleteUser);

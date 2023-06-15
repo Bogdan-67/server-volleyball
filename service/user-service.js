@@ -63,6 +63,52 @@ class UserService {
     return { count: count, rows: [...usersPage] };
   }
 
+  async searchUsers(search, group, offset, limit) {
+    let users;
+    const groupTerms = group.split(' '); // Разделяем строку по пробелам
+    const groupQuery = groupTerms.map((term) => `%${term.toLowerCase()}%`); // Преобразуем каждый термин поиска в lowercase
+    const searchTerms = search.split(' '); // Разделяем строку по пробелам
+    const searchQuery = searchTerms.map((term) => `%${term.toLowerCase()}%`); // Преобразуем каждый термин поиска в lowercase
+    if (group !== '' && search !== '') {
+      console.log('Выполнилась Первая часть ФИО:', search, 'Группа:', group);
+      users = await db.query(
+        'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role WHERE  (LOWER(name) LIKE ANY ($1) OR LOWER(surname) LIKE ANY ($1) OR LOWER(patronimyc) LIKE ANY ($1)) AND ( LOWER(team) LIKE ANY ($2))',
+        [searchQuery, groupQuery],
+      );
+    } else if (search || group) {
+      console.log('Выполнилась вторая часть ФИО:', search, 'Группа:', group);
+      if (search) {
+        users = await db.query(
+          'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role WHERE LOWER(name) LIKE ANY ($1) OR LOWER(surname) LIKE ANY ($1) OR LOWER(patronimyc) LIKE ANY ($1)',
+          [searchQuery],
+        );
+      } else {
+        users = await db.query(
+          'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role WHERE  LOWER(team) LIKE ANY ($1)',
+          [groupQuery],
+        );
+      }
+    } else {
+      console.log('Выполнилась третья часть');
+      users = await db.query(
+        'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role',
+      );
+    }
+
+    const usersArr = users.rows.map((item) => {
+      const user = new UserDTO(item);
+      return { ...user };
+    });
+
+    const count = usersArr.length;
+    const usersPage = usersArr.slice(offset, offset + limit);
+
+    console.log('UsersSearch', usersArr);
+    console.log('limit', limit, 'offset', offset);
+
+    return { count, rows: [...usersPage] };
+  }
+
   async getSelectUsers(req, res) {
     const users = await db.query(
       'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user',
