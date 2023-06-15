@@ -63,6 +63,37 @@ class UserService {
     return { count: count, rows: [...usersPage] };
   }
 
+  async searchUsers(search, offset, limit) {
+    let users;
+    if (search !== '') {
+      console.log('Выполнилась Первая часть', search);
+      const searchTerms = search.split(' '); // Разделяем строку по пробелам
+      const searchQuery = searchTerms.map((term) => `%${term}%`); // Формируем массив с шаблонами поиска
+      users = await db.query(
+        'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role WHERE name LIKE ANY ($1) OR surname LIKE ANY ($1) OR patronimyc LIKE ANY ($1)',
+        [searchQuery],
+      );
+    } else {
+      console.log('Выполнилась вторая часть');
+      users = await db.query(
+        'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role',
+      );
+    }
+
+    const usersArr = users.rows.map((item) => {
+      const user = new UserDTO(item);
+      return { ...user };
+    });
+
+    const count = usersArr.length;
+    const usersPage = usersArr.slice(offset, offset + limit);
+
+    console.log('UsersSearch', usersArr);
+    console.log('limit', limit, 'offset', offset);
+
+    return { count, rows: [...usersPage] };
+  }
+
   async getSelectUsers(req, res) {
     const users = await db.query(
       'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user',
