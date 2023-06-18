@@ -159,8 +159,7 @@ class TrainService {
       throw ApiError.UnauthorisedError();
     }
     if (!date_end) {
-      let date = new Date().toLocaleString().slice(0, 10).replaceAll('.', '-');
-      let new_date = date.slice(6, 10) + '-' + date.slice(3, 5) + '-' + date.slice(0, 2);
+      let new_date = new Date().toISOString();
       date_end = new_date;
     }
     if (!date_start) {
@@ -189,8 +188,7 @@ class TrainService {
       throw ApiError.BadRequest('Не введено название команды!');
     }
     if (!date_end) {
-      let date = new Date().toLocaleString().slice(0, 10).replaceAll('.', '-');
-      let new_date = date.slice(6, 10) + '-' + date.slice(3, 5) + '-' + date.slice(0, 2);
+      let new_date = new Date().toISOString();
       date_end = new_date;
     }
     if (!date_start) {
@@ -293,8 +291,7 @@ class TrainService {
       throw ApiError.BadRequest('ID пользователя null');
     }
     if (!date_end || date_end === 'undefined') {
-      let date = new Date().toLocaleString().slice(0, 10).replaceAll('.', '-');
-      let new_date = date.slice(6, 10) + '-' + date.slice(3, 5) + '-' + date.slice(0, 2);
+      let new_date = new Date().toISOString();
       date_end = new_date;
     }
     if (!date_start || date_start === 'undefined') {
