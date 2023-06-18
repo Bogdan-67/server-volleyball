@@ -50,7 +50,7 @@ class TrainService {
         throw ApiError.BadRequest('Введен несуществующий пользователь!');
       }
       var utc = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
-      console.log('utc', utc);
+
       const checkTeamToday = await db.query(
         `SELECT * FROM trainings WHERE date = $1 AND day_team = $2`,
         [utc, day_team],
@@ -76,8 +76,6 @@ class TrainService {
       newTrain.push(newUserTrainDto);
     });
     await Promise.all(promises);
-
-    console.log('newTrain', newTrain);
 
     return newTrain;
   }
@@ -117,7 +115,6 @@ class TrainService {
     const data = await db.query(`SELECT DISTINCT date FROM trainings WHERE day_team = $1`, [
       day_team,
     ]);
-    console.log(data.rows);
 
     const dates = data.rows.map((obj) => {
       return obj.date;
@@ -165,14 +162,12 @@ class TrainService {
       let date = new Date().toLocaleString().slice(0, 10).replaceAll('.', '-');
       let new_date = date.slice(6, 10) + '-' + date.slice(3, 5) + '-' + date.slice(0, 2);
       date_end = new_date;
-      console.log('date_end:', date_end);
     }
     if (!date_start) {
       const date = await db.query(`SELECT MIN(date) FROM trainings WHERE account_id = $1`, [
         account_id,
       ]);
       date_start = date.rows[0].min;
-      console.log('date_start:', date_start);
     }
     const trains = await db.query(
       `SELECT * FROM trainings WHERE account_id = $1 AND date BETWEEN $2 AND $3 ORDER BY date DESC`,
@@ -197,14 +192,12 @@ class TrainService {
       let date = new Date().toLocaleString().slice(0, 10).replaceAll('.', '-');
       let new_date = date.slice(6, 10) + '-' + date.slice(3, 5) + '-' + date.slice(0, 2);
       date_end = new_date;
-      console.log('date_end:', date_end);
     }
     if (!date_start) {
       const date = await db.query(`SELECT MIN(date) FROM trainings WHERE account_id = $1`, [
         account_id,
       ]);
       date_start = date.rows[0].min;
-      console.log('date_start:', date_start);
     }
     const trains = await db.query(`SELECT DISTINCT account_id FROM trainings WHERE day_team = $1`, [
       day_team,
@@ -222,7 +215,6 @@ class TrainService {
       };
       return newObj;
     });
-    console.log('actionsTypes', actionsTypes);
 
     const stat = players.map(async (player) => {
       let playerStat = {
@@ -240,22 +232,21 @@ class TrainService {
       );
       const fio =
         fioQuery.rows[0].surname + ' ' + fioQuery.rows[0].name + ' ' + fioQuery.rows[0].patronimyc;
-      console.log('fio', fio);
+
       playerStat['fio'] = fio;
       for (let i = 1; i <= actionsTypes.length; i++) {
         const actions = await db.query(
           `SELECT * FROM actions WHERE id_action_type = $1 AND account_id = $2 AND day_team = $3 AND date BETWEEN $4 AND $5`,
           [i, player, day_team, date_start, date_end],
         );
-        console.log('actions', actions.rows);
+
         const winCount = actions.rows.filter((obj) => obj.score === 1).length;
         const lossCount = actions.rows.filter((obj) => obj.score === -1).length;
         const count = actions.rows.length;
 
         const actionStat = (winCount - lossCount) / count > 0 ? (winCount - lossCount) / count : 0;
-        console.log('actionStat', actionStat);
+
         const actionStatFixed = +actionStat.toFixed(2);
-        console.log('actionStatFixed', actionStatFixed);
 
         switch (i) {
           // Подача
@@ -286,16 +277,13 @@ class TrainService {
       }
       return playerStat;
     });
-    console.log('stat before promise', stat);
 
     let result = [];
 
     await Promise.all(stat).then((results) => {
       result = results.map((result) => result);
-      console.log('objectsArray', result);
     });
 
-    console.log('stat after promise', stat);
     return result;
   }
 
@@ -313,7 +301,7 @@ class TrainService {
       const date = await db.query(`SELECT MIN(date) FROM actions WHERE account_id = $1`, [id]);
       date_start = date.rows[0].min;
     }
-    console.log('after if date_start');
+
     let playerStat = {
       inning: {},
       attacks: {},
@@ -383,11 +371,11 @@ class TrainService {
     if (!account_id) {
       throw ApiError.UnauthorisedError();
     }
-    console.log('id_train', id_train);
+
     const deletedTrain = await db.query(`DELETE FROM trainings WHERE id_train = $1 RETURNING *`, [
       id_train,
     ]);
-    console.log('deletedTrain', deletedTrain.rows[0]);
+
     return deletedTrain.rows[0];
   }
 
@@ -400,7 +388,7 @@ class TrainService {
       `DELETE FROM trainings WHERE date = $1 AND day_team = $2 RETURNING *`,
       [date, day_team],
     );
-    console.log('deletedTrain', deletedTrain.rows);
+
     return deletedTrain.rows;
   }
 
@@ -412,29 +400,28 @@ class TrainService {
         [name_action, id_train],
       );
       const winCNum = Number(win_count.rows[0].count);
-      console.log('winCNum', winCNum);
+
       const loss_count = await db.query(
         `SELECT COUNT(*) FROM actions WHERE score=-1 AND name_action=$1 AND id_train = $2`,
         [name_action, id_train],
       );
       const lossCNum = Number(loss_count.rows[0].count);
-      console.log('lossCNum', lossCNum);
+
       const count = await db.query(
         `SELECT COUNT(*) FROM actions WHERE name_action=$1 AND id_train=$2`,
         [name_action, id_train],
       );
       const cNum = Number(count.rows[0].count);
-      console.log('cNum', cNum);
+
       const stat = (winCNum - lossCNum) / cNum > 0 ? (winCNum - lossCNum) / cNum : 0;
-      console.log('stat', stat);
+
       const statFixed = +stat.toFixed(2);
-      console.log('statFixed', statFixed, typeof statFixed);
-      console.log('id_train', id_train);
+
       const upd = await db.query(
         `UPDATE trainings SET ${column} = $1 WHERE id_train = $2 RETURNING *`,
         [statFixed, id_train],
       );
-      console.log('upd', upd.rows);
+
       return upd.rows[0];
     };
 
@@ -445,7 +432,6 @@ class TrainService {
       case 1:
         await updTrain('inning_stat')
           .then((data) => {
-            console.log('data', data);
             upd = data;
           })
           .catch((err) => {
@@ -456,7 +442,6 @@ class TrainService {
       case 2:
         await updTrain('attacks_stat')
           .then((data) => {
-            console.log('data', data);
             upd = data;
           })
           .catch((err) => {
@@ -467,7 +452,6 @@ class TrainService {
       case 3:
         await updTrain('blocks_stat')
           .then((data) => {
-            console.log('data', data);
             upd = data;
           })
           .catch((err) => {
@@ -478,7 +462,6 @@ class TrainService {
       case 4:
         await updTrain('catch_stat')
           .then((data) => {
-            console.log('data', data);
             upd = data;
           })
           .catch((err) => {
@@ -489,7 +472,6 @@ class TrainService {
       case 5:
         await updTrain('defence_stat')
           .then((data) => {
-            console.log('data', data);
             upd = data;
           })
           .catch((err) => {
@@ -500,7 +482,6 @@ class TrainService {
       case 6:
         await updTrain('support_stat')
           .then((data) => {
-            console.log('data', data);
             upd = data;
           })
           .catch((err) => {
@@ -508,12 +489,12 @@ class TrainService {
           });
         break;
     }
-    console.log('id', upd);
+
     const user = await db.query(
       `SELECT * FROM accounts LEFT JOIN users ON accounts.id_user = users.id_user WHERE id_account = $1`,
       [upd.account_id],
     );
-    console.log('user', user.rows);
+
     return new TrainDTO({ ...user.rows[0], ...upd });
   }
 
@@ -536,8 +517,6 @@ class TrainService {
         train.rows[0].account_id,
       ],
     );
-    console.log(action.rows);
-    console.log('id_train', id_train);
 
     return this.calculateTrain(id_action_type, id_train, name_action);
   }
@@ -607,7 +586,7 @@ class TrainService {
       `INSERT INTO action_types(name_type, result, win_condition, loss_condition, description) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [name_type, result, win_condition, loss_condition, description],
     );
-    console.log(actionType.rows);
+
     return actionType.rows[0];
   }
 

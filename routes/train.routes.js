@@ -22,8 +22,6 @@ router.get('/actions', authMiddleware, trainController.getUserTrainActions);
 router.get('/train-actions', authMiddleware, trainController.getTrainActions);
 router.post('/action-types', checkRole('ADMIN'), trainController.addActionType);
 router.get('/action-types', authMiddleware, trainController.getActionsTypes);
-router.put('/action', checkRole('EDITOR'), trainController.editAction);
 router.delete('/train-action', checkRole('EDITOR'), trainController.deleteTrainAction);
-router.delete('/action', checkRole('EDITOR'), trainController.deleteAction);
 
 module.exports = router;

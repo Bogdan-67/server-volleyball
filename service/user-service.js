@@ -58,8 +58,7 @@ class UserService {
     });
     const count = users.rows.length;
     const usersPage = usersArr.slice(offset, offset + limit);
-    console.log('Users', usersArr);
-    console.log('limit', limit, 'offset', offset);
+
     return { count: count, rows: [...usersPage] };
   }
 
@@ -70,13 +69,11 @@ class UserService {
     const searchTerms = search.split(' '); // Разделяем строку по пробелам
     const searchQuery = searchTerms.map((term) => `%${term.toLowerCase()}%`); // Преобразуем каждый термин поиска в lowercase
     if (group !== '' && search !== '') {
-      console.log('Выполнилась Первая часть ФИО:', search, 'Группа:', group);
       users = await db.query(
         'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role WHERE  (LOWER(name) LIKE ANY ($1) OR LOWER(surname) LIKE ANY ($1) OR LOWER(patronimyc) LIKE ANY ($1)) AND ( LOWER(team) LIKE ANY ($2))',
         [searchQuery, groupQuery],
       );
     } else if (search || group) {
-      console.log('Выполнилась вторая часть ФИО:', search, 'Группа:', group);
       if (search) {
         users = await db.query(
           'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role WHERE LOWER(name) LIKE ANY ($1) OR LOWER(surname) LIKE ANY ($1) OR LOWER(patronimyc) LIKE ANY ($1)',
@@ -89,7 +86,6 @@ class UserService {
         );
       }
     } else {
-      console.log('Выполнилась третья часть');
       users = await db.query(
         'SELECT * FROM users LEFT JOIN accounts ON accounts.id_user=users.id_user LEFT JOIN roles ON accounts.role_id=roles.id_role',
       );
@@ -103,9 +99,6 @@ class UserService {
     const count = usersArr.length;
     const usersPage = usersArr.slice(offset, offset + limit);
 
-    console.log('UsersSearch', usersArr);
-    console.log('limit', limit, 'offset', offset);
-
     return { count, rows: [...usersPage] };
   }
 
@@ -117,7 +110,7 @@ class UserService {
       const user = new SelectUsersDTO(item);
       return { ...user };
     });
-    console.log('Users', usersArr);
+
     return usersArr;
   }
 

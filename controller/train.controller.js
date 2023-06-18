@@ -14,7 +14,7 @@ class TrainController {
   async addTeamTrain(req, res, next) {
     try {
       const { account_id, day_team, players } = req.body;
-      console.log(account_id, day_team, players);
+
       const newTeamTrain = await trainService.addTeamTrain(account_id, day_team, players);
       res.status(200).json(newTeamTrain);
     } catch (e) {
@@ -73,7 +73,7 @@ class TrainController {
       page = +page || 1;
       limit = +limit || 8;
       let offset = page * limit - limit;
-      console.log('getTrains date_start:', date_start, 'date_end:', date_end);
+
       const trains = await trainService.getTrains(account_id, date_start, date_end, offset, limit);
       res.status(200).json(trains);
     } catch (e) {
@@ -83,9 +83,9 @@ class TrainController {
   async getTeamRangeStat(req, res, next) {
     try {
       const { date_start, date_end, account_id, day_team } = req.query;
-      console.log(req.query);
+
       const stat = await trainService.getTeamRangeStat(account_id, day_team, date_start, date_end);
-      console.log('stat before send', stat);
+
       res.status(200).json(stat);
     } catch (e) {
       next(e);
@@ -104,7 +104,7 @@ class TrainController {
         id_train,
       );
       const stat = await trainService.getUserStat(id, id_train, date_start, date_end);
-      console.log('stat before send', stat);
+
       res.status(200).json(stat);
     } catch (e) {
       next(e);
@@ -144,7 +144,7 @@ class TrainController {
         date,
         day_team,
       );
-      console.log('newAction', newAction);
+
       res.status(200).json(newAction);
     } catch (e) {
       next(e);
@@ -202,18 +202,6 @@ class TrainController {
     try {
       const actionsTypes = await trainService.getActionsTypes();
       res.status(200).json(actionsTypes);
-    } catch (e) {
-      next(e);
-    }
-  }
-  async editAction(req, res, next) {
-    try {
-    } catch (e) {
-      next(e);
-    }
-  }
-  async deleteAction(req, res, next) {
-    try {
     } catch (e) {
       next(e);
     }

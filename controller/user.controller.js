@@ -45,7 +45,7 @@ class UserController {
       limit = +limit || 8;
       let offset = page * limit - limit;
       const getUsers = await UserService.getUsers(offset, limit);
-      console.log(getUsers);
+
       res.status(200).json(getUsers);
     } catch (e) {
       next(e);
@@ -58,7 +58,7 @@ class UserController {
       limit = +limit || 8;
       let offset = page * limit - limit;
       const searchUsers = await UserService.searchUsers(search, group, offset, limit);
-      console.log(searchUsers);
+
       res.status(200).json(searchUsers);
     } catch (e) {
       next(e);
@@ -77,7 +77,7 @@ class UserController {
   async updateUser(req, res, next) {
     try {
       const updatedUser = await UserService.updateUser(req.body, req.params.id);
-      console.log('UpdateUser', updatedUser);
+
       res.status(200).json(updatedUser);
     } catch (e) {
       next(e);

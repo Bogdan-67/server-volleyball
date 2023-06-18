@@ -32,12 +32,11 @@ class AuthService {
   }
 
   async refresh(refreshToken) {
-    console.log('refresh token', refreshToken);
     if (!refreshToken) {
       throw ApiError.UnauthorisedError();
     }
     const userData = tokenService.validateRefreshToken(refreshToken);
-    console.log('userData', userData);
+
     const tokenFromDb = await tokenService.findToken(refreshToken);
     if (!userData || !tokenFromDb || !userData.id_account) {
       throw ApiError.UnauthorisedError();
@@ -52,10 +51,9 @@ class AuthService {
     const userRole = await db.query(`SELECT * FROM roles WHERE id_role = $1`, [
       account.rows[0].role_id,
     ]);
-    console.log('userRole.rows[0]', userRole.rows[0]);
 
     const userDto = new UserDTO({ ...account.rows[0], ...user.rows[0], ...userRole.rows[0] });
-    console.log('userDto', userDto);
+
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id_account, tokens.refreshToken);
     return { ...tokens, user: { ...userDto } };

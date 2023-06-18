@@ -19,8 +19,6 @@ module.exports = function (role) {
         return next(ApiError.UnauthorisedError());
       }
 
-      console.log(userData);
-
       if (userData.role !== role && userData.role !== 'ADMIN') {
         return next(ApiError.BadRequest('Нет прав доступа'));
       }
