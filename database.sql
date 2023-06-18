@@ -6,7 +6,7 @@ CREATE TABLE users(
     phone VARCHAR(20),
     email VARCHAR(100),
     team VARCHAR(100),
-    img VARCHAR(255),
+    img VARCHAR(255) DEFAULT 'avatar.jpg'
 );
 
 CREATE TABLE roles(
