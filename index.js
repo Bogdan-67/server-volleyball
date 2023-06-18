@@ -11,7 +11,7 @@ const trainRouter = require('./routes/train.routes');
 const roleRouter = require('./routes/role.routes');
 const errorMiddleware = require('./middlewares/error-middleware');
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
