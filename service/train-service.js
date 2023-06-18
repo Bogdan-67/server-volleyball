@@ -590,7 +590,7 @@ class TrainService {
       return new ActionDTO({ ...action });
     });
 
-    const count = actions.length;
+    const count = actions.rows.length;
     const actionsPage = actionsDto.slice(offset, offset + limit);
     return { count: count, actions: [...actionsPage] };
   }
